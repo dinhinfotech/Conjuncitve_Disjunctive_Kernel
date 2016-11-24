@@ -87,38 +87,35 @@ competitive w.r.t. state-of-the-art kernel approaches.
 
 \section{Introduction and Related Work} \label{introduction} 
 
-Predictive systems for gene-disease associations are often based on the
-definition of a notion of gene-gene similarity. A common strategy is to encode
-relations between genes as a network and use graph based techniques to make
-useful inferences. In the last decades, a number of graph kernel methods have
-been proposed that directly exploit transitive properties in biological
-networks.
-
-The prototypical method is the Diffusion kernel (DK) \cite{ledk} inspired by
-the heat diffusion phenomenon. The key idea is to allow a given amount of heat
-placed on nodes to diffuse through the edges. The similarity between two nodes
-$v_{i}, v_{j}$ is then defined as the amount of heat starting from $v_{i}$ and
-reaching $v_{j}$ within a given time interval. In DK the higher is the number
-of paths connecting two vertices, the more heat can flow between them, which
-introduces an undesired bias that penalize peripheral nodes w.r.t. central
-ones. This problem is tackled by a modified version of DK  called Markov
-exponential diffusion kernel (MED) \cite{medk} where a Markov matrix replaces
-the Laplacian matrix.  Another kernel called Markov diffusion kernel (MD)
-\cite{mdk}, exploits instead the notion of {\em diffusion distances}, a
+Predictive systems for gene-disease associations are often based on a notion
+of similarity between genes. A common strategy is to encode relations between
+genes as a network and use graph based techniques to make useful inferences.
+In the last decades, a number of graph kernel methods have been proposed that
+directly exploit transitive properties in biological networks. The
+prototypical method is the Diffusion kernel (DK) \cite{ledk} inspired by the
+heat diffusion phenomenon. The key idea is to allow a given amount of {\em
+heat} placed on nodes to {\em diffuse} through the edges. The similarity
+between two nodes $v_{i}, v_{j}$ is then defined as the amount of heat
+starting from $v_{i}$ and reaching $v_{j}$ within a given time interval. In DK
+the heat flow is proportional to the number of paths connecting two vertices,
+which introduces an undesired bias that penalize peripheral nodes w.r.t.
+central ones. This problem is tackled by a modified version of DK called
+Markov exponential diffusion kernel (MED) \cite{medk} where a Markov matrix
+replaces the Laplacian matrix.  Another kernel called Markov diffusion kernel
+(MD) \cite{mdk}, exploits instead the notion of {\em diffusion distances}, a
 measure of similarity between patterns of heat diffusion. The Regularized
 Laplacian kernel (RL) \cite{rlk} represents instead a normalized version of
 the random walk with restart model and defines the node similarity as the
-number of paths connecting two nodes with different lengths.
-
-These approaches can be applied to networks that are dense and have nodes with
-high degree, however they do not exhibit a high discriminative capacity.
-This is in part due to the fact that they process information in an additive
-and independent fashion which prevents them from precisely modeling the
+number of paths connecting two nodes with different lengths. All these
+approaches can be applied to dense networks with high degree nodes. A drawback
+of these approaches is however their relatively low discriminative capacity.
+This is in part due to the fact that information is processed in an additive
+and independent fashion which prevents them from accurately modeling the
 configuration of each gene's context. To address this issue here we propose to
 employ a {\em decompositional} graph kernel (DGK) \cite{covolution_kernel}
 technique. To exploit its higher discriminative capacity we first decompose
 the network in a collection of connected sparse graphs and then we develop a
-suitable kernel, that we call the Conjunctive Disjunctive Node Kernel (CDNK).
+suitable kernel, that we call Conjunctive Disjunctive Node Kernel (CDNK).
 
 
 \section{Method}\label{method}
@@ -140,9 +137,13 @@ of the step $(i-1)$. The iteration stops when the $G_{H_{i}}$ of the output is e
 
 \textit{Clique Decomposition}: The clique decomposition begins with finding the set of cliques $L$ in $G$ that have size no less than $C$. For each clique in $L$, first, we add a new node to $G$. We then connect the new node to clique's nodes with disjunctive edges and to all neighborhood of clique's nodes at distance 1 with conjunctive edges. Finally, we remove all conjunctive edges that have end points at one of the clique nodes.
 
-\subsection{Node Labeling}
-We nominate a method to label for graph nodes (genes). In our method, the \textit{gene ontology} \cite{ontology} is employed to vectorize nodes. We consider the set of biological terms used in the database as the bag of terms. First, for each gene we construct a binary vector whose each element equals to 1 if the corresponding term relates to that gene and 0 otherwise. As a consequence, we have a list of vectors for a given gene list. Next, we cluster genes into a given number of clusters. Last, the cluster labels associated to genes are assigned to their corresponding nodes.
-
+\subsection{Node Labeling} The similarity notion defined by a decomposition
+approach is based on the count of common fragments. A node kernel for single
+network cannot therefore have unique gene identifiers as node labels, but
+rather one has to define a small finite alphabet. We use the \textit{gene
+ontology} \cite{ontology} to construct binary vectors representing the bag-of-
+words encoding for each gene. The resulting representations are then clustered
+to finally yield a discretized label for each gene.
 
 \subsection{The Neighborhood Subgraph Pairwise Distance Kernel}
 The NSPDK is an instance of convolution kernel which is designed for measuring the similarity between graphs.
