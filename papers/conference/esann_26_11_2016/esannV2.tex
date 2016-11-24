@@ -44,7 +44,7 @@
 
 \begin{document}
 %style file for ESANN manuscripts
-\title{Conjunctive Disjunctive Edge \\Graph Node Kernel}
+\title{The Conjunctive Disjunctive Node Kernel}
 
 %***********************************************************************
 % AUTHORS INFORMATION AREA
@@ -72,29 +72,75 @@ Georges-Kohler-Allee 106, 79110 Freiburg, Germany\\
 
 \maketitle
 
-\begin{abstract}\noindent 
-Gene-disease associations are inferred on the basis of similarities between genes and similarities between diseases. Biological relationships that are exploited range from disease phenotypes, interacting proteins, proteins that participate in pathways and gene expression profiles. Graph kernel methods have become a prominent approach for gene-disease association prediction. Most kernels are based on a notion of information diffusion that does not capture the detailed configuration of related network regions. Here we propose a novel and highly discriminative graph kernel method that explicitly models the configuration of each gene's context. The empirical evaluation on tens of biological databases show that our proposal is competitive w.r.t. state-of-the-art kernel approaches.
+\begin{abstract} Gene-disease associations are inferred on the basis of
+similarities between genes. Biological relationships that are exploited to
+define similarities range from interacting proteins, proteins that participate
+in pathways and gene expression profiles. Though graph kernel methods have
+become a prominent approach for association prediction, most solutions are
+based on a notion of information diffusion that does not capture the
+specificity of different network parts. Here we propose a graph kernel method that
+explicitly models the configuration of each gene's context. An empirical
+evaluation on several biological databases show that our proposal is
+competitive w.r.t. state-of-the-art kernel approaches.
+
 \end{abstract}
 
-\section{Introduction and Related Work} \label{introduction}
-Predictive systems for gene-disease associations are often based on the definition of a notion of gene-gene similarity. A common strategy is to encode relations between genes as a network and use graph based techniques to make useful inferences. In the last decades, a number of graph kernel methods have been proposed that directly exploit transitive properties in biological networks. 
+\section{Introduction and Related Work} \label{introduction} 
 
-The most well-known graph node kernel named Diffusion kernel (DK) is proposed in \cite{ledk}. This kernel is based on the heat diffusion phenomenon. First, a given amount of heat is put on each node and diffused through the edges of the graph in an arbitrary time interval. Then the similarity between the node couple $(v_{i}, v_{j})$ is measured as the amount of heat starting from $v_{i}$ and reaching $v_{j}$ within the given time. In DK, the similarity between two high degree nodes is generally higher compared to that between two degree ones. Intuitively, the more paths connect two vertices, the more heat can flow between them. This could be problematic since pero nodes have unbalanced similarities with respect to central nodes. In order to make the strength of individual vertices comparable, a modified version of DK is introduced in \cite{medk} called Markov exponential diffusion kernel (MED) in which it replaces the Laplacian matrix in DK by a Markov matrix.  Another kernel called Markov diffusion kernel (MD) is introduced in \cite{mdk}. It works by exploiting the idea of diffusion distance, which is a measure of how similar the pattern of heat diffusion is among a pair of initialized nodes. In other words, it expresses how much nodes influences each other in a similar fashion. If their diffusion ways are alike, the similarity will be high and, vice versa. The Regularized Laplacian kernel (RL) \cite{rlk} represents a normalized version of the random walk with restart model. It measures the node similarity by counting the paths connecting two nodes with different lengths.
+Predictive systems for gene-disease associations are often based on the
+definition of a notion of gene-gene similarity. A common strategy is to encode
+relations between genes as a network and use graph based techniques to make
+useful inferences. In the last decades, a number of graph kernel methods have
+been proposed that directly exploit transitive properties in biological
+networks.
 
-These approaches have the advantage that can be applied to networks that are dense and have nodes with high degree, however they also do not have a high discriminative capacity. This is in part due to the fact that they process information in an additive and independent fashion which prevents them from precisely modeling the configuration of each gene's context. To address this issue here we propose to employ a {\em decompositional} graph kernel (DGK) \cite{covolution_kernel} technique. To exploit its higher discriminative potential we first decompose the network in a collection of connected sparse graphs and then we develop a suitable kernel, that we call the Conjunctive Disjunctive Edge Graph Node Kernel (CDGK).
+The prototypical method is the Diffusion kernel (DK) \cite{ledk} inspired by
+the heat diffusion phenomenon. The key idea is to allow a given amount of heat
+placed on nodes to diffuse through the edges. The similarity between two nodes
+$v_{i}, v_{j}$ is then defined as the amount of heat starting from $v_{i}$ and
+reaching $v_{j}$ within a given time interval. In DK the higher is the number
+of paths connecting two vertices, the more heat can flow between them, which
+introduces an undesired bias that penalize peripheral nodes w.r.t. central
+ones. This problem is tackled by a modified version of DK  called Markov
+exponential diffusion kernel (MED) \cite{medk} where a Markov matrix replaces
+the Laplacian matrix.  Another kernel called Markov diffusion kernel (MD)
+\cite{mdk}, exploits instead the notion of {\em diffusion distances}, a
+measure of similarity between patterns of heat diffusion. The Regularized
+Laplacian kernel (RL) \cite{rlk} represents instead a normalized version of
+the random walk with restart model and defines the node similarity as the
+number of paths connecting two nodes with different lengths.
+
+These approaches can be applied to networks that are dense and have nodes with
+high degree, however they do not exhibit a high discriminative capacity.
+This is in part due to the fact that they process information in an additive
+and independent fashion which prevents them from precisely modeling the
+configuration of each gene's context. To address this issue here we propose to
+employ a {\em decompositional} graph kernel (DGK) \cite{covolution_kernel}
+technique. To exploit its higher discriminative capacity we first decompose
+the network in a collection of connected sparse graphs and then we develop a
+suitable kernel, that we call the Conjunctive Disjunctive Node Kernel (CDNK).
 
 
 \section{Method}\label{method}
 
-\subsection{Notation and Definitions}
-We intently follow the notations used in \cite{nspdk}. A graph $G = (V,E)$ is a structure that consists of two sets: a node set \textit{V} and an edge set \textit{E}. The notation \textit{V(G)} and \textit{E(G)} are used to refer to the node set and edge set of \textit{G}. The \textit{distance} between two vertices $u$ and $v$, notated as $\mathcal{D}(u,v)$, is the length of the shortest path between them. The \textit{neighborhood} with radius $r$ of a vertex $v$ is the set of vertices at a distance no greater than $r$ from $v$ and denoted by $N_r(v)$. The \textit{induced subgraph} $\mathcal{N}(W)$ is a graph induced from \textit{G} with the node set \textit{W} and the edge set containing every edge in \textit{G} whose endpoints  are in \textit{W}. The \textit{neighborhood subgraph} with radius $r$ of vertex $v$ is the subgraph induced by the neighborhood with radius $r$ of $v$ and is denoted by $\mathcal{N}_{r}^{v}$. The \textit{degree} of a node \textit{v} is the cardinality of its neighborhood set with radius 1 and is denoted as \textit{d(v)}. A \textit{clique} of the graph \textit{G} is a fully connected subgraph of \textit{G}.
-
 \subsection{Network Decomposition}
+
+Dense networks, or networks with nodes that have a high degree, cannot be
+meaningfully processed by decomposition kernels based on neighborhood matches
+since even the immediate context can be too large and hence unique.
+
+\textit{Notation and Definitions}
+A graph $G = (V,E)$ is a structure that consists of two sets: a node set \textit{V} and an edge set \textit{E}. The notation \textit{V(G)} and \textit{E(G)} are used to refer to the node set and edge set of \textit{G}. The \textit{distance} between two vertices $u$ and $v$, notated as $\mathcal{D}(u,v)$, is the length of the shortest path between them. The \textit{neighborhood} with radius $r$ of a vertex $v$ is the set of vertices at a distance no greater than $r$ from $v$ and denoted by $N_r(v)$. The \textit{induced subgraph} $\mathcal{N}(W)$ is a graph induced from \textit{G} with the node set \textit{W} and the edge set containing every edge in \textit{G} whose endpoints  are in \textit{W}. The \textit{neighborhood subgraph} with radius $r$ of vertex $v$ is the subgraph induced by the neighborhood with radius $r$ of $v$ and is denoted by $\mathcal{N}_{r}^{v}$. The \textit{degree} of a node \textit{v} is the cardinality of its neighborhood set with radius 1 and is denoted as \textit{d(v)}. A \textit{clique} of the graph \textit{G} is a fully connected subgraph of \textit{G}.
+
+
+In this section, we introduce a new method for graph decomposition. The method is based on the idea of kcore and clique decomposition discussed in \cite{kcore}, \cite{clique} respectively. Besides, we pose to use two forms of edge called \textit{Conjunctive} and \textit{Disjunctive}. In the method, when checking the node degree or clique, we only consider the conjunctive. Given a graph $G$, a degree threshold $D$ and a clique size threshold $C$, in the following we describe two steps of the method: kcore decomposition and clique decomposition.
+
 \textit{Kcore Decomposition}: Kcore decomposition intend to decompose a given graph to have a graph without any node degree greater than $D$. Kcore contains an iterative process in which each round consists of a procedure to alternately extract a high degree and a low degree subgraph from the input graph. The high degree subgraph ($G_H$) is the induced subgraph on the set of nodes with degree bigger than $D$, meanwhile the low degree subgraph ($G_L$) is the one on the set of nodes with degree smaller then $D$. At the first round, we takes $G$ as the input. At the step $i$, the input graph is $G_{H_{i-1}}$ taken from the output 
 of the step $(i-1)$. The iteration stops when the $G_{H_{i}}$ of the output is empty. When the decomposition process is done, we form a decomposed graph by making the union of all $G_{L_{i}}$ taken from all rounds. We then add the set of edges from $G$ that are not present in any $G_{L_{i}}$ as the \textit{disjunctive} edges of the decomposed graph. 
 
 \textit{Clique Decomposition}: The clique decomposition begins with finding the set of cliques $L$ in $G$ that have size no less than $C$. For each clique in $L$, first, we add a new node to $G$. We then connect the new node to clique's nodes with disjunctive edges and to all neighborhood of clique's nodes at distance 1 with conjunctive edges. Finally, we remove all conjunctive edges that have end points at one of the clique nodes.
-\subsection{Graph Node Labeling}
+
+\subsection{Node Labeling}
 We nominate a method to label for graph nodes (genes). In our method, the \textit{gene ontology} \cite{ontology} is employed to vectorize nodes. We consider the set of biological terms used in the database as the bag of terms. First, for each gene we construct a binary vector whose each element equals to 1 if the corresponding term relates to that gene and 0 otherwise. As a consequence, we have a list of vectors for a given gene list. Next, we cluster genes into a given number of clusters. Last, the cluster labels associated to genes are assigned to their corresponding nodes.
 
 
@@ -106,11 +152,9 @@ Given a graph $G \in \mathcal{G}$ ($\mathcal{G}$ is the graph domain) and two ro
  $\kappa_{r,d}(G,G^{'}) = \sum\limits_{\substack{A_v, B_u \ \in \ R_{r,d}^{-1}(G) \\ {A'}_{v'}, {B'}_{u'} \ \in \ R_{r,d}^{-1}(G') }} { \sigma(A_v,A'_{v'})\sigma(B_u,B'_{u'}) }$,
 \end{center}
 where $\sigma(x,y)$ is the \textit{exact matching function} that returns 1 if $x$ is isomorphic to $y$ and 0 otherwise. In order to solve the graph isomorphism problem, an efficient approximate algorithm is also proposed in \cite{nspdk}. Finally, the NSPDK is defined as $K(G,G') = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$. For efficiency issue, we limit the values of $r$ and $d$ with the upper bounds $r^*$ and $d^*$, respectively.
-\subsection{Graph Decomposition}
-In this section, we introduce a new method for graph decomposition. The method is based on the idea of kcore and clique decomposition discussed in \cite{kcore}, \cite{clique} respectively. Besides, we pose to use two forms of edge called \textit{Conjunctive} and \textit{Disjunctive}. In the method, when checking the node degree or clique, we only consider the conjunctive. Given a graph $G$, a degree threshold $D$ and a clique size threshold $C$, in the following we describe two steps of the method: kcore decomposition and clique decomposition.
 
-\subsection{The Conjunctive Disjunctive Edge Graph Node Kernel}
-In this section, we describe our proposed kernel, CDGK, which is a modification of NSPDK to measure the node similarity in the graph which consists of conjunctive and disjunctive edges. In our kernel, we consider only conjunctive edges when computing the distance between nodes and extracting neighborhood subgraphs. We define two relations: the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$, (ii) $\mathcal{D}(u,v)= d$; and the \textit{disjunctive relation} $R_{r,d}^{\vee}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$,  (ii) there exists a vertex $w$ such that $\mathcal{D}(u,w)= d$, (iii) $(w,v)$ is a disjunctive edge.
+\subsection{The Conjunctive Disjunctive Node Kernel}
+In this section, we describe our proposed kernel, CDNK, which is a modification of NSPDK to measure the node similarity in the graph which consists of conjunctive and disjunctive edges. In our kernel, we consider only conjunctive edges when computing the distance between nodes and extracting neighborhood subgraphs. We define two relations: the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$, (ii) $\mathcal{D}(u,v)= d$; and the \textit{disjunctive relation} $R_{r,d}^{\vee}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$,  (ii) there exists a vertex $w$ such that $\mathcal{D}(u,w)= d$, (iii) $(w,v)$ is a disjunctive edge.
 
 We define $\kappa_{r,d}$, an instance of the DGK on the relation $R^{\wedge}_{r,d}$ and $R^{\vee}_{r,d}$ as
 \begin{center}
@@ -120,22 +164,23 @@ We define $\kappa_{r,d}$, an instance of the DGK on the relation $R^{\wedge}_{r,
   { \textbf{1}_{A_u \cong B_v}.{ \textbf{1}_{A'_{u'} \cong B'_{v'}}}}$,
 \end{center}
 where $\textbf{1}_{A \cong B}$ is the indicator function that returns 1 if A is isomorphic to B and 0 otherwise.
-$\kappa_{r,d}$ counts the number of identical pairs of neighboring graphs of radius $r$ at a distance $d$ between two vertices. The CDGK is defined as $K(u,v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(u,v)}}$.
+$\kappa_{r,d}$ counts the number of identical pairs of neighboring graphs of radius $r$ at a distance $d$ between two vertices. The CDNK is defined as $K(u,v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(u,v)}}$.
+
 \section{Evaluation}
 \label{evaluation}
-In this section, we aim at evaluating the performance of our proposed kernel and comparing it with four kernels described in Section \ref{related_work}.
-\subsection{Dataset}
-We employ two datasets used in \cite{medk} for the experiment.
+We perform an empirical evaluation of the predictive performance of several kernel based methods on two of the datasets used in \cite{medk}.
 
 \textbf{BioGPS:} A gene co-expression network is constructed from BioGPS dataset, which contains 79 tissues in duplicates, measured with the Affymetrix U133A array. Pairwise Pearson correlation coefficients (PCC) are calculated and a pair of genes are linked by an edge if the PCC value is larger than 0.5.
 
-\textbf{Pathways:} The pathway information is retrieved from KEGG, Reactome, PharmGKB and the Pathway Interaction Database. If a couple of proteins co-participate in any pathway, two corresponding genes that produce them are linked when constructing network.  
+\textbf{Pathways:} Pathway information is retrieved from KEGG, Reactome, PharmGKB and the Pathway Interaction Database. If a couple of proteins co-participate in any pathway, the two corresponding genes are linked.  
+
 \subsection{Evaluation Methods}
 We evaluate the performance of graph node kernels in the gene prioritization problem. Given a set of genes known to be associated to a given disease, gene prioritization is a task that aims to rank the candidate genes based on their probabilities to be related to that disease.
 
 Similar to the evaluation process used in \cite{medk}, we choose 12 diseases in which each one contains at least 30 confirmed genes. For each disease, we construct a positive set $\mathcal{P}$ and a negative set $\mathcal{N}$. The set $\mathcal{P}$ consists of all disease gene members. The set $\mathcal{N}$ is built by randomly picking genes from known disease genes, genes associated at least to one disease class, but not related to the current class, such that $\vert \mathcal{N} \vert = \frac{1}{2} \vert \mathcal{P} \vert$. After that, leave-one-out cross validation is used to evaluate the performance of the algorithm. Each turn one gene is out to be the test gene and the rest are used to train the model using SVM. Starting from the output scores, we compute a decision score $q_i$ for the test gene $g_i$ as the top percentage value of score $s_i$ among all scores. $q_{i} = \frac{\vert \{j\vert s_{i} \geq s_{j}  \rbrace \vert}{N}, i = 1,2,\ldots,N$, where $s_i$, $s_j$ are scores, N is the length of gene list. We collect all decision scores for every gene in the training set of a disease to form a global decision score list. The performance of the algorithm is measured by using AUC calculated that list. 
+
 \subsection{Parameter Selection}
-In order to select the optimal parameter values for each kernel, we use one disease gene set for parameter selection and use Kfold with \textit{k} equals to 3. We set the values for diffusion parameter in DK and MED as $\lbrace 10^{-3}, 10^{-3}, 10^{-2}, 10^{-1} \rbrace$, for time steps in MD as $\lbrace 1, 10, 100 \rbrace$ and for RL parameter as $\lbrace 1, 4, 7 \rbrace$. For CDGK, we set values for degree threshold in $\lbrace 10,\ 15,\ 20 \rbrace$, clique size threshold in $\lbrace 4,\ 5 \rbrace$, maximum radius in $\lbrace 1,\ 2 \rbrace$, maximum distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Finally, the $C$ of SVM is set as $\lbrace 10^{-5},  \ 10^{-4}, \ 10^{-3},\ 10^{-2},\ 10^{-1},\ 1,\ 10,\ 10^2 \rbrace$.
+In order to select the optimal parameter values for each kernel, we use one disease gene set for parameter selection and use Kfold with \textit{k} equals to 3. We set the values for diffusion parameter in DK and MED as $\lbrace 10^{-3}, 10^{-3}, 10^{-2}, 10^{-1} \rbrace$, for time steps in MD as $\lbrace 1, 10, 100 \rbrace$ and for RL parameter as $\lbrace 1, 4, 7 \rbrace$. For CDNK, we set values for degree threshold in $\lbrace 10,\ 15,\ 20 \rbrace$, clique size threshold in $\lbrace 4,\ 5 \rbrace$, maximum radius in $\lbrace 1,\ 2 \rbrace$, maximum distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Finally, the $C$ of SVM is set as $\lbrace 10^{-5},  \ 10^{-4}, \ 10^{-3},\ 10^{-2},\ 10^{-1},\ 1,\ 10,\ 10^2 \rbrace$.
 
 \section{Results and Discussion}
 \label{results_discussion}
@@ -190,17 +235,20 @@ $\overline{Rank}$ & 3.5 & 4.3 & 2.8 & 2.5 & \textbf{2.0}
  & 4.8 & 3.9 & 2.5 & 2.0 & \textbf{1.8}\\
  \hline 
 \end{tabular}
-\caption{\textit{The performance of kernels on different genetic diseases using BioGPS and Pathway dataset. Each element in the table shows the AUC in percentage and the order of kernel comparing to the rest (AUC/Rank). K1 = DK, K2 = MD, K3 = MED, K4 = RL, K5 = CDGK.}}
+\caption{\textit{The performance of kernels on different genetic diseases using BioGPS and Pathway dataset. Each element in the table shows the AUC in percentage and the order of kernel comparing to the rest (AUC/Rank). K1 = DK, K2 = MD, K3 = MED, K4 = RL, K5 = CDNK.}}
 \label{table:results}
 \end{table}
-Table \ref{table:results} shows the AUC performance of the models trained by using different graph node kernels on 11 genetic diseases using BioGPS and Pathways datasets. In the table, the best result on each disease is marked in bold. By observing the results, we note that the kernel CDGK perform the best results comparing with other considered kernels. Particularly, the CDGK is ranked at the first order in seven out of 11 diseases on both datasets. It also illustrates the highest results in average AUC and rank with 73.3/2.0, 76.5/1.8, and the AUC difference with the second best ones are 5.5$\%$ and 1$\%$ on BioGPS and Pathways, respectively. The MED and RL show similar and moderate results with small gap between them. Last, DK and MD demonstrate modest performance in average comparing with other adopted kernels. They are ranked in the last position in many diseases, especially 7 times out of 11 for MD in BioGPS and 10 out of 11 for DK in Pathways. While DK shows better performance than MD in BioGPS, it presents worse in Pathways. In conclusion, CDGK outperforms all employed graph node kernels in term of both average rank and AUC measure.
 
-The CDGK shows the state of the art results. However, in the case that the input graph has high average node degree and they are uniformly distributed, the decomposed graph is too sparse and it can lead our kernel to the poor performance.
-\section{Conclusions}
-\label{conclusions}
-In this paper, we first introduce an algorithm for graph decomposition in which we propose the use of conjunctive and disjunctive edges. Second we presented a new graph node kernel that is able to efficiently exploit the graph properties to measure node similarities in the graph. The evaluation results demonstrate that our graph node kernel outperforms all kernels used in the experiments. 
+Table \ref{table:results} shows the AUC performance of the models trained by using different graph node kernels on 11 genetic diseases using BioGPS and Pathways datasets. In the table, the best result on each disease is marked in bold. By observing the results, we note that the kernel CDNK perform the best results comparing with other considered kernels. Particularly, the CDNK is ranked at the first order in seven out of 11 diseases on both datasets. It also illustrates the highest results in average AUC and rank with 73.3/2.0, 76.5/1.8, and the AUC difference with the second best ones are 5.5$\%$ and 1$\%$ on BioGPS and Pathways, respectively. The MED and RL show similar and moderate results with small gap between them. Last, DK and MD demonstrate modest performance in average comparing with other adopted kernels. They are ranked in the last position in many diseases, especially 7 times out of 11 for MD in BioGPS and 10 out of 11 for DK in Pathways. While DK shows better performance than MD in BioGPS, it presents worse in Pathways. In conclusion, CDNK outperforms all employed graph node kernels in term of both average rank and AUC measure.
 
-For the coming work of our research, we plan to apply the CDGK for the disease gene identification problem which is relied on data fusion.
+The CDNK shows the state of the art results. However, in the case that the input graph has high average node degree and they are uniformly distributed, the decomposed graph is too sparse and it can lead our kernel to the poor performance.
+
+\section{Conclusions} \label{conclusions} We have shown how decomposing a
+network in a set of connected sparse graphs allows us to take advantage of the
+greater discriminative power of CDNK, a novel decomposition kernel, and
+achieve state- of-the-art results. In future work we will investigate how to
+extend the CDNK approach to gene-disease association problems exploiting
+multiple heterogeneous information sources.
 
 \begin{footnotesize}
 
