@@ -150,22 +150,24 @@ The NSPDK is an instance of convolution kernel which is designed for measuring t
 
 Given a graph $G \in \mathcal{G}$ ($\mathcal{G}$ is the graph domain) and two rooted graphs $A_u, B_v$, the relation $R_{r,d}(A_u, B_v, G)$ is defined to be true iff $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$ and $\mathcal{D}(u,v)= d$. We denote $R^{-1}$ as the inverse relation that returns subgraphs of $G$, $R^{-1}_{r,d}(G) = \lbrace A_u, B_v | R_{r,d}(A_u,B_v,G)\rbrace$. The kernel $\kappa_{r,d}$ over $\mathcal{G} \times \mathcal{G}$ takes into account the number of identical neighboring graph pairs with radius $r$ at distance $d$ between two graph and is formulated as:
 \begin{center}
- $\kappa_{r,d}(G,G^{'}) = \sum\limits_{\substack{A_v, B_u \ \in \ R_{r,d}^{-1}(G) \\ {A'}_{v'}, {B'}_{u'} \ \in \ R_{r,d}^{-1}(G') }} { \sigma(A_v,A'_{v'})\sigma(B_u,B'_{u'}) }$,
+ $\kappa_{r,d}(G,G^{'}) = \!\!\!\!\!\!\!\!\!\!\!\! \sum\limits_{\substack{A_v, B_u \ \in \ R_{r,d}^{-1}(G) \\ {A'}_{v'}, {B'}_{u'} \ \in \ R_{r,d}^{-1}(G') }} \!\!\!\!\!\!\!\!\!\!\!\!
+ { { \textbf{1}_{A_{v} \cong A'_{v'}}} \cdot { \textbf{1}_{B_{u} \cong B'_{u'}}}  }$,
 \end{center}
-where $\sigma(x,y)$ is the \textit{exact matching function} that returns 1 if $x$ is isomorphic to $y$ and 0 otherwise. In order to solve the graph isomorphism problem, an efficient approximate algorithm is also proposed in \cite{nspdk}. Finally, the NSPDK is defined as $K(G,G') = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$. For efficiency issue, we limit the values of $r$ and $d$ with the upper bounds $r^*$ and $d^*$, respectively.
+where $\textbf{1}_{A \cong B}$ is the \textit{exact matching function} that returns 1 if $A$ is isomorphic to $B$ and 0 otherwise. In order to solve the graph isomorphism problem, an efficient approximate algorithm is also proposed in \cite{nspdk}. Finally, the NSPDK is defined as $K(G,G') = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$. For efficiency issue, we limit the values of $r$ and $d$ with the upper bounds $r^*$ and $d^*$, respectively.
 
 \subsection{The Conjunctive Disjunctive Node Kernel}
 In this section, we describe our proposed kernel, CDNK, which is a modification of NSPDK to measure the node similarity in the graph which consists of conjunctive and disjunctive edges. In our kernel, we consider only conjunctive edges when computing the distance between nodes and extracting neighborhood subgraphs. We define two relations: the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$, (ii) $\mathcal{D}(u,v)= d$; and the \textit{disjunctive relation} $R_{r,d}^{\vee}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$,  (ii) there exists a vertex $w$ such that $\mathcal{D}(u,w)= d$, (iii) $(w,v)$ is a disjunctive edge.
 
 We define $\kappa_{r,d}$, an instance of the DGK on the relation $R^{\wedge}_{r,d}$ and $R^{\vee}_{r,d}$ as
 \begin{center}
- $\kappa_{r,d}(u,v) = \sum\limits_{\substack
+ $\kappa_{r,d}(G_u,G_v) = \!\!\!\!\!\!\!\!\!\!\!\! \sum\limits_{\substack
  {A_u,\ {A'}_{u'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G)\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G)) \\
-  B_v,\ {B'}_{v'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G)\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G)) }}
+  B_v,\ {B'}_{v'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G)\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G)) }} \!\!\!\!\!\!\!\!\!\!\!\!
   { \textbf{1}_{A_u \cong B_v}.{ \textbf{1}_{A'_{u'} \cong B'_{v'}}}}$,
 \end{center}
-where $\textbf{1}_{A \cong B}$ is the indicator function that returns 1 if A is isomorphic to B and 0 otherwise.
-$\kappa_{r,d}$ counts the number of identical pairs of neighboring graphs of radius $r$ at a distance $d$ between two vertices. The CDNK is defined as $K(u,v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(u,v)}}$.
+$\kappa_{r,d}$ counts the number of identical pairs of neighboring graphs of radius $r$ at a distance $d$ between two vertices. The CDNK is finally defined as 
+
+$$K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}$$.
 
 \section{Evaluation}
 \label{evaluation}
