@@ -175,26 +175,23 @@ $N_r(v)$.
 % following we describe two steps of the method: kcore decomposition and clique
 % decomposition.
 
-\textit{K-core Decomposition.} 
-The K-core decomposition \cite{kcore} procedure partitions the node set in two
-groups on the basis of the degree of each vertex w.r.t. a threshold degree
-$D$. We use the vertex partition to induce an edge partition: edges that
-have endpoints in the same part are marked as {\em conjunctive} edges, while
-edges with endpoints in different parts are marked as {\em disjunctive} edges.
-We apply the K-core decomposition iteratively using a series of threshold
-values $\{D_0, D_1, \ldots, D_l \}$. 
+\textit{K-core Decomposition.}  The K-core decomposition \cite{kcore}
+ partitions the node set in two groups on the basis of the degree of
+each vertex w.r.t. a threshold degree $D$. We use the vertex partition to
+induce an edge partition: edges that have endpoints in the same part are
+marked as {\em conjunctive} edges, while edges with endpoints in different
+parts are marked as {\em disjunctive} edges. We apply the K-core decomposition
+iteratively considering only the graph induced by the conjunctive edges until
+no node has a degree greater than $D$.
 
 \textit{Clique Decomposition}: 
 
-The clique decomposition (inspired by \cite{clique}) procedure partitions the 
-
-
-begins with finding the set of cliques
-$L$ in $G$ that have size no less than $C$. For each clique in $L$, first, we
-add a new node to $G$. We then connect the new node to clique's nodes with
-disjunctive edges and to all neighborhood of clique's nodes at distance 1 with
-conjunctive edges. Finally, we remove all conjunctive edges that have end
-points at one of the clique nodes.
+The clique decomposition (inspired by \cite{clique}) identifies all the
+cliques (completely connected subgraphs) with a number of nodes greater than a
+threshold size $C$. For each clique a new 'representative' node is added. The
+endpoints of all edges incident on the clique's nodes are transferred to the
+representative node. Finally all edges with both endpoints in the clique are
+removed.
 
 \subsection{Node Graph Kernels}
 The principle is: neighborhoods counts.
