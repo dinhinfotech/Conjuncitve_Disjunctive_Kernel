@@ -193,19 +193,19 @@ both endpoints in the clique are removed.
 We start from the Neighborhood Subgraph Pairwise Distance Kernel (NSPDK)
 \cite{nspdk} and adapt it to express the similarity between nodes in a single
 network. The key idea in NSPDK is to decompose graphs in small fragments and
-count how many close pairs of fragments are shared between two instances. We
+count how many pairs of fragments are shared between two instances. We
 introduce two improvements: 1) we partition the features according to each node's
 neighborhood, and 2) the feature creation distinguishes between disjunctive and conjunctive edges.
 
 
 \subsubsection{The Neighborhood Subgraph Pairwise Distance Kernel}
 
-The NSPDK is an instance of convolution kernel where the parts are pairs of
-neighborhood subgraphs whose roots are near. Formally, given a graph $G \in
-\mathcal{G}$ ($\mathcal{G}$ is the graph domain) and two rooted graphs $A_u,
-B_v$, the relation $R_{r,d}(A_u, B_v, G)$ is defined to be true iff $A_u$ and
-$B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$
-($B_v$) needs to be isomorphic with some $\mathcal{N}_r$ and
+The NSPDK is an instance of convolution kernel \cite{covolution_kernel} where
+the parts are pairs of neighborhood subgraphs whose roots are near. Formally,
+given a graph $G \in \mathcal{G}$ ($\mathcal{G}$ is the graph domain) and two
+rooted graphs $A_u, B_v$, the relation $R_{r,d}(A_u, B_v, G)$ is defined to be
+true iff $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$,
+where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$ and
 $\mathcal{D}(u,v)= d$. We denote $R^{-1}$ as the inverse relation that returns
 subgraphs of $G$, $R^{-1}_{r,d}(G) = \lbrace A_u, B_v |
 R_{r,d}(A_u,B_v,G)\rbrace$. The kernel $\kappa_{r,d}$ over $\mathcal{G} \times
@@ -218,25 +218,33 @@ pairs with radius $r$ at distance $d$ between two graph and is formulated as:
 }$, \end{center} where $\textbf{1}_{A \cong B}$ is the \textit{exact matching
 function} that returns 1 if $A$ is isomorphic to $B$ and 0 otherwise. In order
 to solve the graph isomorphism problem, an efficient approximate algorithm is
-also proposed in \cite{nspdk}. Finally, the NSPDK is defined as $K(G,G') =
-\sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$. For efficiency issue,
+ proposed in \cite{nspdk}. Finally, the NSPDK is defined as $K(G,G') =
+\sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$, where for efficiency reasons,
 the values of $r$ and $d$ are upper bounded to a given $r^*$ and $d^*$,
 respectively.
 
 \subsubsection{The Conjunctive Disjunctive Node Kernel}
 
+We extend NSPDK and define a kernel $K(G_u,G_v)$ between two copies of the
+same network $G$ where we distinguish the nodes $u$ and $v$ respectively. The
+idea is to define the features of a node $u$ as the NSPDK features limited to
+have as one of the roots always the vertex $u$. In addition we distinguish
+between two types of edges, termed {\em conjunctive} and {\em disjunctive}
+edges. We consider only conjunctive edges when computing distances. When 
+
 In our kernel, we consider only conjunctive edges when computing the distance
 between nodes and extracting neighborhood subgraphs. We define two relations:
-the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G)$ to be true
-iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$,
+the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G)$ is true iff
+(i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$,
 where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$, (ii)
 $\mathcal{D}(u,v)= d$; and the \textit{disjunctive relation}
-$R_{r,d}^{\vee}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in
-$\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be
+$R_{r,d}^{\vee}(A_u, B_v, G)$ is true iff (i) $A_u$ and $B_v$ are in $\lbrace
+\mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be
 isomorphic with some $\mathcal{N}_r$,  (ii) there exists a vertex $w$ such
-that $\mathcal{D}(u,w)= d$, (iii) $(w,v)$ is a disjunctive edge.
+that $\mathcal{D}(u,w)= d$, and (iii) $(w,v)$ is a disjunctive edge.
+We define $\kappa_{r,d}$ on the relations $R^{\wedge}_{r,d}$ and
+$R^{\vee}_{r,d}$ as
 
-We define $\kappa_{r,d}$, an instance of the DGK on the relation $R^{\wedge}_{r,d}$ and $R^{\vee}_{r,d}$ as
 \begin{center}
  $\kappa_{r,d}(G_u,G_v) = \!\!\!\!\!\!\!\!\!\!\!\! \sum\limits_{\substack
  {A_u,\ {A'}_{u'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G)\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G)) \\
@@ -246,16 +254,16 @@ We define $\kappa_{r,d}$, an instance of the DGK on the relation $R^{\wedge}_{r,
 $\kappa_{r,d}$ counts the number of identical pairs of neighboring graphs of radius $r$ at a distance $d$ between two vertices. The CDNK is finally defined as 
 
 $$K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}.$$
+where once again for efficiency reasons,
+the values of $r$ and $d$ are upper bounded to a given $r^*$ and $d^*$.
 
 \section{Evaluation}
 \label{evaluation}
-We perform an empirical evaluation of the predictive performance of several kernel based methods on two of the datasets used in \cite{medk}.
+We perform an empirical evaluation of the predictive performance of several kernel based methods on two of the databases used in \cite{medk}.
 
 \textbf{BioGPS:} A gene co-expression network is constructed from BioGPS dataset, which contains 79 tissues, measured with the Affymetrix U133A array. Edges are inserted when the pairwise Pearson correlation coefficient (PCC) between genes is larger than 0.5.
 
 \textbf{Pathways:} Pathway information is retrieved from KEGG, Reactome, PharmGKB and the Pathway Interaction Database. If a couple of proteins co-participate in any pathway, the two corresponding genes are linked.  
-
-\subsection{Experimental Setup}
 
 To evaluate the performance of graph node kernels we analyze the {\em gene
 prioritization problem}. Given a set of genes known to be associated to a
@@ -346,7 +354,7 @@ $\overline{Rank}$ & 3.5 & 4.3 & 2.8 & 2.5 & \textbf{2.0}
  & 4.8 & 3.9 & 2.5 & 2.0 & \textbf{1.8}\\
  \hline 
 \end{tabular}
-\caption{\textit{The performance of kernels on different genetic diseases using BioGPS and Pathway dataset. Each element in the table shows the AUC in percentage and the order of kernel comparing to the rest (AUC/Rank). K1 = DK, K2 = MD, K3 = MED, K4 = RL, K5 = CDNK.}}
+\caption{\textit {Predictive performance on 11 gene-disease associations using networks induced by the BioGPS and the Pathway database. We report the AUC ROC and the rank for each kernel method: K1 = DK, K2 = MD, K3 = MED, K4 = RL, K5 = CDNK.}}
 \label{table:results}
 \end{table}
 
@@ -360,22 +368,18 @@ average rank with 73.3/2.0, 76.5/1.8, with a difference w.r.t. the second best
 of 5.5$\%$ and 1$\%$ on BioGPS and Pathways, respectively. MED and RL show
 similar and moderate results with small gap between them. DK and MD exhibit
 modest performance on average and  are ranked last in many cases: 7
-times out of 11 for MD in BioGPS and 10 out of 11 for DK in Pathways. While DK
-shows better performance than MD in BioGPS, it is worse in Pathways.
-
+times out of 11 for MD in BioGPS and 10 out of 11 for DK in Pathways. 
 Finally note that although CDNK has state of the art performance, there are
 cases that would lead to a significant decrease in the quality of the results,
-namely when networks have uniform high average node degree and they are
-uniformly distributed, the decomposed graph is too sparse and it can lead our
-kernel to the poor performance.
+namely when networks have high {\em average} node degree as this would lead to
+very sparse and fragmented decompositions.
 
 \section{Conclusions} \label{conclusions} We have shown how decomposing a
 network in a set of connected sparse graphs allows us to take advantage of the
-greater discriminative power of CDNK, a novel decomposition kernel, and
-achieve state-of-the-art results. In future work we will investigate how to
-extend the CDNK approach to gene-disease association problems exploiting
-multiple heterogeneous information sources and we will investigate data driven
-methods to define network decompositions.
+discriminative power of CDNK, a novel decomposition kernel, to achieve state-
+of-the-art results. In future work we will investigate how to extend the CDNK
+approach to network problems when  multiple heterogeneous information sources
+are available. 
 
 \begin{footnotesize}
 
