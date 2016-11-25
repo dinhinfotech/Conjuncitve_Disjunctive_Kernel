@@ -147,17 +147,16 @@ In gene-disease associations networks it is not uncommon to find nodes with
 high degrees. Unfortunately these cases cannot be effectively processed by
 decomposition kernels based on exact neighborhood matches\footnote{It is
 improbable to find multiple cases of nodes with exactly the same, say 73
-neighbors.}. Instead we propose to decompose the network in a linked
-collection of sparse sub-networks where each node has a reduced connectivity.
-More precisely we distinguish two types of edges: {\em conjunctive} and {\em
-disjunctive} edges. Nodes linked by conjunctive edges are going to be used
-jointly to define the notion of context. Nodes linked by disjunctive edges are
-instead used to define features based only on the pairwise co-occurrence of
-the genes at the endpoints. The aim of the following decompositions is to link
-sparse sub-networks (which comprise only conjunctive edges) via disjunctive
-edges. The final decomposition is obtained by first applying the k-core
-decomposition and then applying the clique decomposition.
-
+neighbors, and the similarity is defined by the number of shared identical
+neighborhoods in our decomposition kernels.}. Instead we propose to decompose
+the network in a linked collection of sparse sub-networks where each node has
+a reduced connectivity. More precisely we distinguish two types of edges: {\em
+conjunctive} and {\em disjunctive} edges. Nodes linked by conjunctive edges
+are going to be used jointly to define the notion of context. Nodes linked by
+disjunctive edges are instead used to define features based only on the
+pairwise co-occurrence of the genes at the endpoints. The aim of the following
+decompositions is to link sparse sub-networks (which comprise only conjunctive
+edges) via disjunctive edges. 
 
 \textit{Definitions.} A graph $G = (V,E)$ is a structure that
 consists of a node set $V(G)$ and an edge set $E(G)$. The
@@ -188,72 +187,79 @@ transferred to the representative node. Disjunctive edges are introduced to
 connect each node in the clique to the representative. Finally all edges with
 both endpoints in the clique are removed.
 
+In our work a network is transformed by applying first the k-core decomposition
+and then the clique decomposition.
+
 \subsection{Node Graph Kernels} 
 
 We start from the Neighborhood Subgraph Pairwise Distance Kernel (NSPDK)
 \cite{nspdk} and adapt it to express the similarity between nodes in a single
 network. The key idea in NSPDK is to decompose graphs in small fragments and
 count how many pairs of fragments are shared between two instances. We
-introduce two improvements: 1) we partition the features according to each node's
-neighborhood, and 2) the feature creation distinguishes between disjunctive and conjunctive edges.
+introduce two improvements: 1) we partition the features according to the
+individual node's neighborhood, and 2) feature construction distinguishes
+between disjunctive and conjunctive edges.
 
 
 \subsubsection{The Neighborhood Subgraph Pairwise Distance Kernel}
 
 The NSPDK is an instance of convolution kernel \cite{covolution_kernel} where
-the parts are pairs of neighborhood subgraphs whose roots are near. Formally,
-given a graph $G \in \mathcal{G}$ ($\mathcal{G}$ is the graph domain) and two
-rooted graphs $A_u, B_v$, the relation $R_{r,d}(A_u, B_v, G)$ is defined to be
-true iff $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$,
-where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$ and
+given a graph $G \in \mathcal{G}$ and two rooted graphs $A_u, B_v$, the
+relation $R_{r,d}(A_u, B_v, G)$ is true iff $A_u \cong \mathcal{N}_r^u$ is a neighborhood subgraph of radius $r$ of $G$ and so is $B_v \cong  \mathcal{N}_r^v$, with roots at distance
 $\mathcal{D}(u,v)= d$. We denote $R^{-1}$ as the inverse relation that returns
-subgraphs of $G$, $R^{-1}_{r,d}(G) = \lbrace A_u, B_v |
-R_{r,d}(A_u,B_v,G)\rbrace$. The kernel $\kappa_{r,d}$ over $\mathcal{G} \times
-\mathcal{G}$ takes into account the number of identical neighboring graph
-pairs with radius $r$ at distance $d$ between two graph and is formulated as:
-\begin{center}  $\kappa_{r,d}(G,G^{'}) = \!\!\!\!\!\!\!\!\!\!\!\!
-\sum\limits_{\substack{A_v, B_u \ \in \ R_{r,d}^{-1}(G) \\ {A'}_{v'},
-{B'}_{u'} \ \in \ R_{r,d}^{-1}(G') }} \!\!\!\!\!\!\!\!\!\!\!\!  { {
-\textbf{1}_{A_{v} \cong A'_{v'}}} \cdot { \textbf{1}_{B_{u} \cong B'_{u'}}}
-}$, \end{center} where $\textbf{1}_{A \cong B}$ is the \textit{exact matching
-function} that returns 1 if $A$ is isomorphic to $B$ and 0 otherwise. In order
-to solve the graph isomorphism problem, an efficient approximate algorithm is
- proposed in \cite{nspdk}. Finally, the NSPDK is defined as $K(G,G') =
-\sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$, where for efficiency reasons,
-the values of $r$ and $d$ are upper bounded to a given $r^*$ and $d^*$,
-respectively.
+all pairs of neighborhoods of radius $r$ at distance $d$ in $G$,
+$R^{-1}_{r,d}(G) = \lbrace A_u, B_v | R_{r,d}(A_u,B_v,G)\rbrace$. The kernel
+$\kappa_{r,d}$ over $\mathcal{G} \times \mathcal{G}$, counts the number of
+such fragments in common in two input graphs: 
+
+\begin{center}
+$\kappa_{r,d}(G,G^{'}) = 
+\!\!\!\!\!\!\!\!\!\!\!\! 
+\sum\limits_{\substack{A_u, B_v \ \in \ R_{r,d}^{-1}(G) \\ 
+{A'}_{u'}, {B'}_{v'} \ \in \ R_{r,d}^{-1}(G')
+}} \!\!\!\!\!\!\!\!\!\!\!\!  { { \textbf{1}_{A_{u} \cong A'_{u'}}} \cdot {
+\textbf{1}_{B_{v} \cong B'_{v'}}} }$, 
+\end{center} 
+
+
+where $\textbf{1}_{A \cong
+B}$ is the \textit{exact matching function} that returns 1 if $A$ is
+isomorphic to $B$ and 0 otherwise.  Finally, the NSPDK is defined as $K(G,G')
+= \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$, where for efficiency
+reasons, the values of $r$ and $d$ are upper bounded to a given $r^*$ and
+$d^*$, respectively.
 
 \subsubsection{The Conjunctive Disjunctive Node Kernel}
 
-We extend NSPDK and define a kernel $K(G_u,G_v)$ between two copies of the
+We extend NSPDK and define a kernel $K(G_u,G_{u'})$ between two copies of the
 same network $G$ where we distinguish the nodes $u$ and $v$ respectively. The
-idea is to define the features of a node $u$ as the NSPDK features limited to
-have as one of the roots always the vertex $u$. In addition we distinguish
-between two types of edges, termed {\em conjunctive} and {\em disjunctive}
-edges. We consider only conjunctive edges when computing distances. When 
+idea is to define the features of a node $u$ as the subset of NSPDK features
+that always have the vertex $u$ as one of the roots. In addition we
+distinguish between two types of edges, termed {\em conjunctive} and {\em
+disjunctive} edges. We consider only conjunctive edges when computing
+distances and hence when we induce neighborhood subgraphs. When choosing the
+pair of neighborhoods to form a single feature, we additionally consider roots
+$u$ and $v$ that are not at distance $d$ but such that $u$ is connected to $w$
+via a disjunctive edge and such that $w$ is at distance $d$ from $v$. In this
+way disjunctive edges can still allow an 'information flow' even if their
+endpoints are only considered in a pairwise fashion and not jointly.
 
-In our kernel, we consider only conjunctive edges when computing the distance
-between nodes and extracting neighborhood subgraphs. We define two relations:
-the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G)$ is true iff
-(i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$,
-where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$, (ii)
-$\mathcal{D}(u,v)= d$; and the \textit{disjunctive relation}
-$R_{r,d}^{\vee}(A_u, B_v, G)$ is true iff (i) $A_u$ and $B_v$ are in $\lbrace
-\mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be
-isomorphic with some $\mathcal{N}_r$,  (ii) there exists a vertex $w$ such
-that $\mathcal{D}(u,w)= d$, and (iii) $(w,v)$ is a disjunctive edge.
-We define $\kappa_{r,d}$ on the relations $R^{\wedge}_{r,d}$ and
-$R^{\vee}_{r,d}$ as
+Formally, we define two relations: the \textit{conjunctive relation}
+$R^{\wedge}_{r,d}(A_u, B_v, G_u)$\footnote{This is identical to the NSPDK relation $R_{r,d}(A_u, B_v, G)$ .}  is true iff (i) $A_u \cong \mathcal{N}_r^u$ is a neighborhood subgraph of radius $r$ of $G_u$ and so is $B_v \cong \mathcal{N}_r^u$,  and (ii) $\mathcal{D}(u,v)= d$; the
+\textit{disjunctive relation} $R_{r,d}^{\vee}(A_u, B_v, G)$ is true iff (i)
+is true, (ii) there
+exists a vertex $w$ such that $\mathcal{D}(w,v)= d$, and (iii) $(u,w)$ is a
+disjunctive edge. We define $\kappa_{r,d}$ on the  inverse relations ${R^{\wedge}_{r,d}}^{ -1}$
+and ${R^{\vee}_{r,d}}^{ -1}$
 
 \begin{center}
  $\kappa_{r,d}(G_u,G_v) = \!\!\!\!\!\!\!\!\!\!\!\! \sum\limits_{\substack
- {A_u,\ {A'}_{u'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G)\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G)) \\
-  B_v,\ {B'}_{v'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G)\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G)) }} \!\!\!\!\!\!\!\!\!\!\!\!
-  { \textbf{1}_{A_u \cong B_v}.{ \textbf{1}_{A'_{u'} \cong B'_{v'}}}}$,
+ {A_u,\ {B}_{v} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G_u)\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G_u)) \\
+  A'_{u'},\ {B'}_{v'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G_{u'})\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G_{u'})) }} \!\!\!\!\!\!\!\!\!\!\!\!
+  { \textbf{1}_{A_u \cong A_{u'}}.{ \textbf{1}_{B_{v} \cong B'_{v'}}}}$,
 \end{center}
 $\kappa_{r,d}$ counts the number of identical pairs of neighboring graphs of radius $r$ at a distance $d$ between two vertices. The CDNK is finally defined as 
-
-$$K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}.$$
+$K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}.$
 where once again for efficiency reasons,
 the values of $r$ and $d$ are upper bounded to a given $r^*$ and $d^*$.
 
@@ -279,17 +285,12 @@ ratio between the dataset sizes is chosen as $\vert \mathcal{N} \vert =
 The predictive performance of each method is evaluated via a leave-one-out
 cross validation: one gene is kept out in turn and the rest
 are used to train an SVM model. 
-
-Starting from the output scores, we compute a decision score $q_i$ for the
+We compute a decision score $q_i$ for the
 test gene $g_i$ as the top percentage value of score $s_i$ among all scores.
-$q_{i} = \frac{\vert \{j\vert s_{i} \geq s_{j} \rbrace \vert}{N}, i =
-1,2,\ldots,N$, where $s_i$, $s_j$ are scores, N is the length of gene list. We
-collect all decision scores for every gene in the training set of a disease to
-form a global decision score list. The performance of the algorithm is finally
-measured as the AUC ROC on that list.
+We collect all decision scores for every gene to
+form a global decision score list on which we compute the AUC ROC.
 
-\subsection{Model Selection}
-
+\textbf{Model Selection.}
 The hyper parameters of the various methods are set using a k-fold on a
 dataset set that is then never used in the predictive performance estimate. We
 try the values for diffusion parameter in DK and MED in $\lbrace 10^{-3},
