@@ -251,42 +251,47 @@ $$K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}.$$
 \label{evaluation}
 We perform an empirical evaluation of the predictive performance of several kernel based methods on two of the datasets used in \cite{medk}.
 
-\textbf{BioGPS:} A gene co-expression network is constructed from BioGPS dataset, which contains 79 tissues in duplicates, measured with the Affymetrix U133A array. Pairwise Pearson correlation coefficients (PCC) are calculated and a pair of genes are linked by an edge if the PCC value is larger than 0.5.
+\textbf{BioGPS:} A gene co-expression network is constructed from BioGPS dataset, which contains 79 tissues, measured with the Affymetrix U133A array. Edges are inserted when the pairwise Pearson correlation coefficient (PCC) between genes is larger than 0.5.
 
 \textbf{Pathways:} Pathway information is retrieved from KEGG, Reactome, PharmGKB and the Pathway Interaction Database. If a couple of proteins co-participate in any pathway, the two corresponding genes are linked.  
 
-\subsection{Evaluation Methods}
-We evaluate the performance of graph node kernels in the gene prioritization problem. Given a set of genes known to be associated to a given disease, gene prioritization is a task that aims to rank the candidate genes based on their probabilities to be related to that disease.
+\subsection{Experimental Setup}
 
-Similar to the evaluation process used in \cite{medk}, we choose 12 diseases
-in which each one contains at least 30 confirmed genes. For each disease, we
-construct a positive set $\mathcal{P}$ and a negative set $\mathcal{N}$. The
-set $\mathcal{P}$ consists of all disease gene members. The set $\mathcal{N}$
-is built by randomly picking genes from known disease genes, genes associated
-at least to one disease class, but not related to the current class, such that
-$\vert \mathcal{N} \vert = \frac{1}{2} \vert \mathcal{P} \vert$. After that,
-leave-one-out cross validation is used to evaluate the performance of the
-algorithm. Each turn one gene is out to be the test gene and the rest are used
-to train the model using SVM. Starting from the output scores, we compute a
-decision score $q_i$ for the test gene $g_i$ as the top percentage value of
-score $s_i$ among all scores. $q_{i} = \frac{\vert \{j\vert s_{i} \geq s_{j}
-\rbrace \vert}{N}, i = 1,2,\ldots,N$, where $s_i$, $s_j$ are scores, N is the
-length of gene list. We collect all decision scores for every gene in the
-training set of a disease to form a global decision score list. The
-performance of the algorithm is measured by using AUC calculated that list.
+To evaluate the performance of graph node kernels we analyze the {\em gene
+prioritization problem}. Given a set of genes known to be associated to a
+given disease, gene prioritization is the task to rank the candidate genes
+based on their probabilities to be related to that disease. Similar to the
+evaluation process used in \cite{medk}, we choose 12 diseases with at least 30
+confirmed genes. For each disease, we construct a positive set $\mathcal{P}$
+with all confirmed disease genes, and a negative set $\mathcal{N}$ which
+contains random genes associated at least to one disease class which is not
+related to the class that is defining the positive set. In \cite{medk} the
+ratio between the dataset sizes is chosen as $\vert \mathcal{N} \vert =
+\frac{1}{2} \vert \mathcal{P} \vert$. 
+The predictive performance of each method is evaluated via a leave-one-out
+cross validation: one gene is kept out in turn and the rest
+are used to train an SVM model. 
 
-\subsection{Parameter Selection}
+Starting from the output scores, we compute a decision score $q_i$ for the
+test gene $g_i$ as the top percentage value of score $s_i$ among all scores.
+$q_{i} = \frac{\vert \{j\vert s_{i} \geq s_{j} \rbrace \vert}{N}, i =
+1,2,\ldots,N$, where $s_i$, $s_j$ are scores, N is the length of gene list. We
+collect all decision scores for every gene in the training set of a disease to
+form a global decision score list. The performance of the algorithm is finally
+measured as the AUC ROC on that list.
 
-In order to select the optimal parameter values for each kernel, we use one
-disease gene set for parameter selection and use Kfold with \textit{k} equals
-to 3. We set the values for diffusion parameter in DK and MED as $\lbrace
-10^{-3}, 10^{-3}, 10^{-2}, 10^{-1} \rbrace$, for time steps in MD as $\lbrace
-1, 10, 100 \rbrace$ and for RL parameter as $\lbrace 1, 4, 7 \rbrace$. For
-CDNK, we set values for degree threshold in $\lbrace 10,\ 15,\ 20 \rbrace$,
-clique size threshold in $\lbrace 4,\ 5 \rbrace$, maximum radius in $\lbrace
-1,\ 2 \rbrace$, maximum distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Finally, the
-$C$ of SVM is set as $\lbrace 10^{-5},  \ 10^{-4}, \ 10^{-3},\ 10^{-2},\
-10^{-1},\ 1,\ 10,\ 10^2 \rbrace$.
+\subsection{Model Selection}
+
+The hyper parameters of the various methods are set using a k-fold on a
+dataset set that is then never used in the predictive performance estimate. We
+try the values for diffusion parameter in DK and MED in $\lbrace 10^{-3},
+10^{-3}, 10^{-2}, 10^{-1} \rbrace$, for time steps in MD in $\lbrace 1, 10,
+100 \rbrace$ and for RL parameter in $\lbrace 1, 4, 7 \rbrace$. For CDNK, we
+try for the degree threshold values in $\lbrace 10,\ 15,\ 20 \rbrace$, clique size
+threshold in $\lbrace 4,\ 5 \rbrace$, maximum radius in $\lbrace 1,\ 2
+\rbrace$, maximum distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Finally, the $C$ of
+SVM is searched in $\lbrace 10^{-5},  \ 10^{-4}, \ 10^{-3},\ 10^{-2},\ 10^{-1},\
+1,\ 10,\ 10^2 \rbrace$.
 
 \section{Results and Discussion}
 \label{results_discussion}
@@ -345,9 +350,24 @@ $\overline{Rank}$ & 3.5 & 4.3 & 2.8 & 2.5 & \textbf{2.0}
 \label{table:results}
 \end{table}
 
-Table \ref{table:results} shows the AUC performance of the models trained by using different graph node kernels on 11 genetic diseases using BioGPS and Pathways datasets. In the table, the best result on each disease is marked in bold. By observing the results, we note that the kernel CDNK perform the best results comparing with other considered kernels. Particularly, the CDNK is ranked at the first order in seven out of 11 diseases on both datasets. It also illustrates the highest results in average AUC and rank with 73.3/2.0, 76.5/1.8, and the AUC difference with the second best ones are 5.5$\%$ and 1$\%$ on BioGPS and Pathways, respectively. The MED and RL show similar and moderate results with small gap between them. Last, DK and MD demonstrate modest performance in average comparing with other adopted kernels. They are ranked in the last position in many diseases, especially 7 times out of 11 for MD in BioGPS and 10 out of 11 for DK in Pathways. While DK shows better performance than MD in BioGPS, it presents worse in Pathways. In conclusion, CDNK outperforms all employed graph node kernels in term of both average rank and AUC measure.
+Table \ref{table:results} shows the AUC performance of the models trained by
+using different graph node kernels on 11 gene-disease association problems
+using the BioGPS and Pathways datasets to materialize the gene relation
+network. In the table, the best result on each disease is marked in bold. We
+note that CDNK ranks first in 7 out of 11 cases using  both networks. CDNK is
+the top performant kernel also when considering the average AUC ROC and the
+average rank with 73.3/2.0, 76.5/1.8, with a difference w.r.t. the second best
+of 5.5$\%$ and 1$\%$ on BioGPS and Pathways, respectively. MED and RL show
+similar and moderate results with small gap between them. DK and MD exhibit
+modest performance on average and  are ranked last in many cases: 7
+times out of 11 for MD in BioGPS and 10 out of 11 for DK in Pathways. While DK
+shows better performance than MD in BioGPS, it is worse in Pathways.
 
-The CDNK shows the state of the art results. However, in the case that the input graph has high average node degree and they are uniformly distributed, the decomposed graph is too sparse and it can lead our kernel to the poor performance.
+Finally note that although CDNK has state of the art performance, there are
+cases that would lead to a significant decrease in the quality of the results,
+namely when networks have uniform high average node degree and they are
+uniformly distributed, the decomposed graph is too sparse and it can lead our
+kernel to the poor performance.
 
 \section{Conclusions} \label{conclusions} We have shown how decomposing a
 network in a set of connected sparse graphs allows us to take advantage of the
