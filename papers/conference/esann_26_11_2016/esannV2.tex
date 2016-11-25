@@ -128,11 +128,10 @@ highly connected components from sparsely connected ones, and 3) we transform
 the neighborhood of each gene in a sparse high dimensional vector that can be
 easily processed by standard machine learning techniques such as SVMs.
 
-\subsection{Gene Labeling}
-The type of networks created to model gene-disease associations problems
-typically represent genes as nodes labeled with a gene identifier. Here we
-take a different approach: since we want to build a predictive system based on
-the configuration of each gene's context, we use as labels a discretized
+\subsection{Gene Labeling} Gene-disease associations networks typically
+represent genes as nodes labeled with a gene identifier. Here we take a
+different approach: since we want to build a predictive system based on the
+configuration of each gene's context, we use as labels a discretized
 functional annotation based on the \textit{gene ontology} \cite{ontology}.
 More precisely,  we use the gene ontology to construct binary vectors
 representing the bag-of- words encoding for each gene. The resulting
@@ -144,13 +143,13 @@ receive the same coarse identifier as label.
 
 \subsection{Network Decomposition} 
 
-Gene-disease associations networks typically have nodes with a high degree.
-These networks cannot be meaningfully processed by decomposition kernels based
-on exact neighborhood matches. Instead we propose to decompose the network in
-a linked collection of sparse sub-networks where each node has a reduced
-connectivity.
+Gene-disease associations networks can have nodes with high degrees.
+Unfortunately these networks cannot be meaningfully processed by decomposition
+kernels based on exact neighborhood matches. Instead we propose to decompose
+the network in a linked collection of sparse sub-networks where each node has
+a reduced connectivity.
 
-\textit{Notation and Definitions.} A graph $G = (V,E)$ is a structure that
+\textit{Definitions.} A graph $G = (V,E)$ is a structure that
 consists of a node set $V(G)$ and an edge set $E(G)$. The
 \textit{distance} between two vertices $u$ and $v$, notated as
 $\mathcal{D}(u,v)$, is the length of the shortest path between them. The
@@ -176,27 +175,26 @@ $N_r(v)$.
 % following we describe two steps of the method: kcore decomposition and clique
 % decomposition.
 
-\textit{K-core Decomposition}: the K-core decomposition \cite{kcore} intend to
-decompose a given graph to have a graph without any node degree greater than
-$D$. Kcore contains an iterative process in which each round consists of a
-procedure to alternately extract a high degree and a low degree subgraph from
-the input graph. The high degree subgraph ($G_H$) is the induced subgraph on
-the set of nodes with degree bigger than $D$, meanwhile the low degree
-subgraph ($G_L$) is the one on the set of nodes with degree smaller then $D$.
-At the first round, we takes $G$ as the input. At the step $i$, the input
-graph is $G_{H_{i-1}}$ taken from the output  of the step $(i-1)$. The
-iteration stops when the $G_{H_{i}}$ of the output is empty. When the
-decomposition process is done, we form a decomposed graph by making the union
-of all $G_{L_{i}}$ taken from all rounds. We then add the set of edges from
-$G$ that are not present in any $G_{L_{i}}$ as the \textit{disjunctive} edges
-of the decomposed graph.
+\textit{K-core Decomposition.} 
+The K-core decomposition \cite{kcore} procedure partitions the node set in two
+groups on the basis of the degree of each vertex w.r.t. a threshold degree
+$D$. We use the vertex partition to induce an edge partition: edges that
+have endpoints in the same part are marked as {\em conjunctive} edges, while
+edges with endpoints in different parts are marked as {\em disjunctive} edges.
+We apply the K-core decomposition iteratively using a series of threshold
+values $\{D_0, D_1, \ldots, D_l \}$. 
 
-\textit{Clique Decomposition}: The clique decomposition begins with finding
-the set of cliques $L$ in $G$ that have size no less than $C$. For each
-clique in $L$, first, we add a new node to $G$. We then connect the new node
-to clique's nodes with disjunctive edges and to all neighborhood of clique's
-nodes at distance 1 with conjunctive edges. Finally, we remove all
-conjunctive edges that have end points at one of the clique nodes.
+\textit{Clique Decomposition}: 
+
+The clique decomposition (inspired by \cite{clique}) procedure partitions the 
+
+
+begins with finding the set of cliques
+$L$ in $G$ that have size no less than $C$. For each clique in $L$, first, we
+add a new node to $G$. We then connect the new node to clique's nodes with
+disjunctive edges and to all neighborhood of clique's nodes at distance 1 with
+conjunctive edges. Finally, we remove all conjunctive edges that have end
+points at one of the clique nodes.
 
 \subsection{Node Graph Kernels}
 The principle is: neighborhoods counts.
