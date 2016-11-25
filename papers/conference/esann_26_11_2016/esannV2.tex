@@ -118,35 +118,94 @@ the network in a collection of connected sparse graphs and then we develop a
 suitable kernel, that we call Conjunctive Disjunctive Node Kernel (CDNK).
 
 
-\section{Method}\label{method}
+\section{Method}\label{method} 
 
-\subsection{Network Decomposition}
+We start from the type of similarity notion computed by decomposition kernels
+between graph instances and adapt it to express the similarity between nodes
+in a single network. In this work we use three key ideas: 1) genes are labeled
+using their functional profile, 2) we transform the network to distinguish
+highly connected components from sparsely connected ones, and 3) we transform
+the neighborhood of each gene in a sparse high dimensional vector that can be
+easily processed by standard machine learning techniques such as SVMs.
 
-Dense networks, or networks with nodes that have a high degree, cannot be
-meaningfully processed by decomposition kernels based on neighborhood matches
-since even the immediate context can be too large and hence unique.
+\subsection{Gene Labeling}
+The type of networks created to model gene-disease associations problems
+typically represent genes as nodes labeled with a gene identifier. Here we
+take a different approach: since we want to build a predictive system based on
+the configuration of each gene's context, we use as labels a discretized
+functional annotation based on the \textit{gene ontology} \cite{ontology}.
+More precisely,  we use the gene ontology to construct binary vectors
+representing the bag-of- words encoding for each gene. The resulting
+representations are then clustered to finally yield a discretized label for
+each gene. In this way genes that have similar functional profiles will
+receive the same coarse identifier as label.
 
-\textit{Notation and Definitions}
-A graph $G = (V,E)$ is a structure that consists of two sets: a node set \textit{V} and an edge set \textit{E}. The notation \textit{V(G)} and \textit{E(G)} are used to refer to the node set and edge set of \textit{G}. The \textit{distance} between two vertices $u$ and $v$, notated as $\mathcal{D}(u,v)$, is the length of the shortest path between them. The \textit{neighborhood} with radius $r$ of a vertex $v$ is the set of vertices at a distance no greater than $r$ from $v$ and denoted by $N_r(v)$. The \textit{induced subgraph} $\mathcal{N}(W)$ is a graph induced from \textit{G} with the node set \textit{W} and the edge set containing every edge in \textit{G} whose endpoints  are in \textit{W}. The \textit{neighborhood subgraph} with radius $r$ of vertex $v$ is the subgraph induced by the neighborhood with radius $r$ of $v$ and is denoted by $\mathcal{N}_{r}^{v}$. The \textit{degree} of a node \textit{v} is the cardinality of its neighborhood set with radius 1 and is denoted as \textit{d(v)}. A \textit{clique} of the graph \textit{G} is a fully connected subgraph of \textit{G}.
 
 
-In this section, we introduce a new method for graph decomposition. The method is based on the idea of kcore and clique decomposition discussed in \cite{kcore}, \cite{clique} respectively. Besides, we pose to use two forms of edge called \textit{Conjunctive} and \textit{Disjunctive}. In the method, when checking the node degree or clique, we only consider the conjunctive. Given a graph $G$, a degree threshold $D$ and a clique size threshold $C$, in the following we describe two steps of the method: kcore decomposition and clique decomposition.
+\subsection{Network Decomposition} 
 
-\textit{Kcore Decomposition}: Kcore decomposition intend to decompose a given graph to have a graph without any node degree greater than $D$. Kcore contains an iterative process in which each round consists of a procedure to alternately extract a high degree and a low degree subgraph from the input graph. The high degree subgraph ($G_H$) is the induced subgraph on the set of nodes with degree bigger than $D$, meanwhile the low degree subgraph ($G_L$) is the one on the set of nodes with degree smaller then $D$. At the first round, we takes $G$ as the input. At the step $i$, the input graph is $G_{H_{i-1}}$ taken from the output 
-of the step $(i-1)$. The iteration stops when the $G_{H_{i}}$ of the output is empty. When the decomposition process is done, we form a decomposed graph by making the union of all $G_{L_{i}}$ taken from all rounds. We then add the set of edges from $G$ that are not present in any $G_{L_{i}}$ as the \textit{disjunctive} edges of the decomposed graph. 
+Gene-disease associations networks typically have nodes with a high degree.
+These networks cannot be meaningfully processed by decomposition kernels based
+on exact neighborhood matches. Instead we propose to decompose the network in
+a linked collection of sparse sub-networks where each node has a reduced
+connectivity.
 
-\textit{Clique Decomposition}: The clique decomposition begins with finding the set of cliques $L$ in $G$ that have size no less than $C$. For each clique in $L$, first, we add a new node to $G$. We then connect the new node to clique's nodes with disjunctive edges and to all neighborhood of clique's nodes at distance 1 with conjunctive edges. Finally, we remove all conjunctive edges that have end points at one of the clique nodes.
+\textit{Notation and Definitions.} A graph $G = (V,E)$ is a structure that
+consists of a node set $V(G)$ and an edge set $E(G)$. The
+\textit{distance} between two vertices $u$ and $v$, notated as
+$\mathcal{D}(u,v)$, is the length of the shortest path between them. The
+\textit{neighborhood} with radius $r$ of a vertex $v$ is the set of vertices
+at a distance no greater than $r$ from $v$ and denoted by $N_r(v)$. 
+The \textit{neighborhood subgraph} with radius $r$ of vertex $v$, denoted by
+$\mathcal{N}_{r}^{v}$,  is the subgraph formed by the nodes in the
+neighborhood with radius $r$ of $v$ and the relative edges with endpoints in
+$N_r(v)$.
 
-\subsection{Node Labeling} The similarity notion defined by a decomposition
-approach is based on the count of common fragments. A node kernel for single
-network cannot therefore have unique gene identifiers as node labels, but
-rather one has to define a small finite alphabet. We use the \textit{gene
-ontology} \cite{ontology} to construct binary vectors representing the bag-of-
-words encoding for each gene. The resulting representations are then clustered
-to finally yield a discretized label for each gene.
+% The \textit{degree} of a node \textit{v} is
+% the cardinality of its neighborhood set with radius 1 and is denoted as
+% \textit{d(v)}. A \textit{clique} of the graph \textit{G} is a fully connected
+% subgraph of \textit{G}.
 
-\subsection{The Neighborhood Subgraph Pairwise Distance Kernel}
-The NSPDK is an instance of convolution kernel which is designed for measuring the similarity between graphs.
+
+% In this section, we introduce a new method for graph decomposition. The method
+% is based on the idea of kcore and clique decomposition discussed in
+% \cite{kcore}, \cite{clique} respectively. Besides, we pose to use two forms of
+% edge called \textit{Conjunctive} and \textit{Disjunctive}. In the method, when
+% checking the node degree or clique, we only consider the conjunctive. Given a
+% graph $G$, a degree threshold $D$ and a clique size threshold $C$, in the
+% following we describe two steps of the method: kcore decomposition and clique
+% decomposition.
+
+\textit{K-core Decomposition}: the K-core decomposition \cite{kcore} intend to
+decompose a given graph to have a graph without any node degree greater than
+$D$. Kcore contains an iterative process in which each round consists of a
+procedure to alternately extract a high degree and a low degree subgraph from
+the input graph. The high degree subgraph ($G_H$) is the induced subgraph on
+the set of nodes with degree bigger than $D$, meanwhile the low degree
+subgraph ($G_L$) is the one on the set of nodes with degree smaller then $D$.
+At the first round, we takes $G$ as the input. At the step $i$, the input
+graph is $G_{H_{i-1}}$ taken from the output  of the step $(i-1)$. The
+iteration stops when the $G_{H_{i}}$ of the output is empty. When the
+decomposition process is done, we form a decomposed graph by making the union
+of all $G_{L_{i}}$ taken from all rounds. We then add the set of edges from
+$G$ that are not present in any $G_{L_{i}}$ as the \textit{disjunctive} edges
+of the decomposed graph.
+
+\textit{Clique Decomposition}: The clique decomposition begins with finding
+the set of cliques $L$ in $G$ that have size no less than $C$. For each
+clique in $L$, first, we add a new node to $G$. We then connect the new node
+to clique's nodes with disjunctive edges and to all neighborhood of clique's
+nodes at distance 1 with conjunctive edges. Finally, we remove all
+conjunctive edges that have end points at one of the clique nodes.
+
+\subsection{Node Graph Kernels}
+The principle is: neighborhoods counts.
+We will modify from graph to nodes in this way: xx
+
+
+\subsubsection{The Original Decomposition Kernel}
+
+The The Neighborhood Subgraph Pairwise Distance Kernel (NSPDK) is an instance of convolution kernel which is designed for measuring the similarity between graphs.
 
 Given a graph $G \in \mathcal{G}$ ($\mathcal{G}$ is the graph domain) and two rooted graphs $A_u, B_v$, the relation $R_{r,d}(A_u, B_v, G)$ is defined to be true iff $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$ and $\mathcal{D}(u,v)= d$. We denote $R^{-1}$ as the inverse relation that returns subgraphs of $G$, $R^{-1}_{r,d}(G) = \lbrace A_u, B_v | R_{r,d}(A_u,B_v,G)\rbrace$. The kernel $\kappa_{r,d}$ over $\mathcal{G} \times \mathcal{G}$ takes into account the number of identical neighboring graph pairs with radius $r$ at distance $d$ between two graph and is formulated as:
 \begin{center}
@@ -155,7 +214,7 @@ Given a graph $G \in \mathcal{G}$ ($\mathcal{G}$ is the graph domain) and two ro
 \end{center}
 where $\textbf{1}_{A \cong B}$ is the \textit{exact matching function} that returns 1 if $A$ is isomorphic to $B$ and 0 otherwise. In order to solve the graph isomorphism problem, an efficient approximate algorithm is also proposed in \cite{nspdk}. Finally, the NSPDK is defined as $K(G,G') = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$. For efficiency issue, we limit the values of $r$ and $d$ with the upper bounds $r^*$ and $d^*$, respectively.
 
-\subsection{The Conjunctive Disjunctive Node Kernel}
+\subsubsection{The Conjunctive Disjunctive Node Kernel}
 In this section, we describe our proposed kernel, CDNK, which is a modification of NSPDK to measure the node similarity in the graph which consists of conjunctive and disjunctive edges. In our kernel, we consider only conjunctive edges when computing the distance between nodes and extracting neighborhood subgraphs. We define two relations: the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$, (ii) $\mathcal{D}(u,v)= d$; and the \textit{disjunctive relation} $R_{r,d}^{\vee}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$,  (ii) there exists a vertex $w$ such that $\mathcal{D}(u,w)= d$, (iii) $(w,v)$ is a disjunctive edge.
 
 We define $\kappa_{r,d}$, an instance of the DGK on the relation $R^{\wedge}_{r,d}$ and $R^{\vee}_{r,d}$ as
@@ -167,7 +226,7 @@ We define $\kappa_{r,d}$, an instance of the DGK on the relation $R^{\wedge}_{r,
 \end{center}
 $\kappa_{r,d}$ counts the number of identical pairs of neighboring graphs of radius $r$ at a distance $d$ between two vertices. The CDNK is finally defined as 
 
-$$K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}$$.
+$$K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}.$$
 
 \section{Evaluation}
 \label{evaluation}
