@@ -134,20 +134,30 @@ different approach: since we want to build a predictive system based on the
 configuration of each gene's context, we use as labels a discretized
 functional annotation based on the \textit{gene ontology} \cite{ontology}.
 More precisely,  we use the gene ontology to construct binary vectors
-representing the bag-of- words encoding for each gene. The resulting
-representations are then clustered to finally yield a discretized label for
-each gene. In this way genes that have similar functional profiles will
-receive the same coarse identifier as label.
+representing the bag-of-words encoding for each gene (i.e. if a GO-term is
+associated with the gene). The resulting representations are then clustered so
+that genes with similar description profiles receive the same class identifier
+as label.
 
 
 
 \subsection{Network Decomposition} 
 
-Gene-disease associations networks can have nodes with high degrees.
-Unfortunately these networks cannot be meaningfully processed by decomposition
-kernels based on exact neighborhood matches. Instead we propose to decompose
-the network in a linked collection of sparse sub-networks where each node has
-a reduced connectivity.
+In gene-disease associations networks it is not uncommon to find nodes with
+high degrees. Unfortunately these cases cannot be effectively processed by
+decomposition kernels based on exact neighborhood matches\footnote{It is
+improbable to find multiple cases of nodes with exactly the same, say 73
+neighbors.}. Instead we propose to decompose the network in a linked
+collection of sparse sub-networks where each node has a reduced connectivity.
+More precisely we distinguish two types of edges: {\em conjunctive} and {\em
+disjunctive} edges. Nodes linked by conjunctive edges are going to be used
+jointly to define the notion of context. Nodes linked by disjunctive edges are
+instead used to define features based only on the pairwise co-occurrence of
+the genes at the endpoints. The aim of the following decompositions is to link
+sparse sub-networks (which comprise only conjunctive edges) via disjunctive
+edges. The final decomposition is obtained by first applying the k-core
+decomposition and then applying the clique decomposition.
+
 
 \textit{Definitions.} A graph $G = (V,E)$ is a structure that
 consists of a node set $V(G)$ and an edge set $E(G)$. The
@@ -160,57 +170,71 @@ $\mathcal{N}_{r}^{v}$,  is the subgraph formed by the nodes in the
 neighborhood with radius $r$ of $v$ and the relative edges with endpoints in
 $N_r(v)$.
 
-% The \textit{degree} of a node \textit{v} is
-% the cardinality of its neighborhood set with radius 1 and is denoted as
-% \textit{d(v)}. A \textit{clique} of the graph \textit{G} is a fully connected
-% subgraph of \textit{G}.
+\textit{K-core decomposition \cite{kcore}}: The node set is partitioned in two
+groups on the basis of the degree of each vertex w.r.t. a threshold degree
+$D$. The vertex partition is used to induce the conjunctive vs disjunctive
+edge partition: edges that have endpoints in the same part are marked as
+conjunctive, while edges with endpoints in different parts are marked as
+disjunctive. We apply the K-core decomposition iteratively considering only
+the graph induced by the conjunctive edges until no node has a degree greater
+than $D$\footnote{The degree is defined only considering incident conjunctive
+edges}.
+
+\textit{Clique decomposition \cite{clique}}:   All the cliques (completely
+connected subgraphs) with a number of nodes greater than a threshold size $C$
+are identified. For each clique a new 'representative' node is added to the
+network. The endpoints of all edges incident on the clique's nodes are
+transferred to the representative node. Disjunctive edges are introduced to
+connect each node in the clique to the representative. Finally all edges with
+both endpoints in the clique are removed.
+
+\subsection{Node Graph Kernels} 
+
+We start from the Neighborhood Subgraph Pairwise Distance Kernel (NSPDK)
+\cite{nspdk} and adapt it to express the similarity between nodes in a single
+network. The key idea in NSPDK is to decompose graphs in small fragments and
+count how many close pairs of fragments are shared between two instances. We
+introduce two improvements: 1) we partition the features according to each node's
+neighborhood, and 2) the feature creation distinguishes between disjunctive and conjunctive edges.
 
 
-% In this section, we introduce a new method for graph decomposition. The method
-% is based on the idea of kcore and clique decomposition discussed in
-% \cite{kcore}, \cite{clique} respectively. Besides, we pose to use two forms of
-% edge called \textit{Conjunctive} and \textit{Disjunctive}. In the method, when
-% checking the node degree or clique, we only consider the conjunctive. Given a
-% graph $G$, a degree threshold $D$ and a clique size threshold $C$, in the
-% following we describe two steps of the method: kcore decomposition and clique
-% decomposition.
+\subsubsection{The Neighborhood Subgraph Pairwise Distance Kernel}
 
-\textit{K-core Decomposition.}  The K-core decomposition \cite{kcore}
- partitions the node set in two groups on the basis of the degree of
-each vertex w.r.t. a threshold degree $D$. We use the vertex partition to
-induce an edge partition: edges that have endpoints in the same part are
-marked as {\em conjunctive} edges, while edges with endpoints in different
-parts are marked as {\em disjunctive} edges. We apply the K-core decomposition
-iteratively considering only the graph induced by the conjunctive edges until
-no node has a degree greater than $D$.
-
-\textit{Clique Decomposition}: 
-
-The clique decomposition (inspired by \cite{clique}) identifies all the
-cliques (completely connected subgraphs) with a number of nodes greater than a
-threshold size $C$. For each clique a new 'representative' node is added. The
-endpoints of all edges incident on the clique's nodes are transferred to the
-representative node. Finally all edges with both endpoints in the clique are
-removed.
-
-\subsection{Node Graph Kernels}
-The principle is: neighborhoods counts.
-We will modify from graph to nodes in this way: xx
-
-
-\subsubsection{The Original Decomposition Kernel}
-
-The The Neighborhood Subgraph Pairwise Distance Kernel (NSPDK) is an instance of convolution kernel which is designed for measuring the similarity between graphs.
-
-Given a graph $G \in \mathcal{G}$ ($\mathcal{G}$ is the graph domain) and two rooted graphs $A_u, B_v$, the relation $R_{r,d}(A_u, B_v, G)$ is defined to be true iff $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$ and $\mathcal{D}(u,v)= d$. We denote $R^{-1}$ as the inverse relation that returns subgraphs of $G$, $R^{-1}_{r,d}(G) = \lbrace A_u, B_v | R_{r,d}(A_u,B_v,G)\rbrace$. The kernel $\kappa_{r,d}$ over $\mathcal{G} \times \mathcal{G}$ takes into account the number of identical neighboring graph pairs with radius $r$ at distance $d$ between two graph and is formulated as:
-\begin{center}
- $\kappa_{r,d}(G,G^{'}) = \!\!\!\!\!\!\!\!\!\!\!\! \sum\limits_{\substack{A_v, B_u \ \in \ R_{r,d}^{-1}(G) \\ {A'}_{v'}, {B'}_{u'} \ \in \ R_{r,d}^{-1}(G') }} \!\!\!\!\!\!\!\!\!\!\!\!
- { { \textbf{1}_{A_{v} \cong A'_{v'}}} \cdot { \textbf{1}_{B_{u} \cong B'_{u'}}}  }$,
-\end{center}
-where $\textbf{1}_{A \cong B}$ is the \textit{exact matching function} that returns 1 if $A$ is isomorphic to $B$ and 0 otherwise. In order to solve the graph isomorphism problem, an efficient approximate algorithm is also proposed in \cite{nspdk}. Finally, the NSPDK is defined as $K(G,G') = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$. For efficiency issue, we limit the values of $r$ and $d$ with the upper bounds $r^*$ and $d^*$, respectively.
+The NSPDK is an instance of convolution kernel where the parts are pairs of
+neighborhood subgraphs whose roots are near. Formally, given a graph $G \in
+\mathcal{G}$ ($\mathcal{G}$ is the graph domain) and two rooted graphs $A_u,
+B_v$, the relation $R_{r,d}(A_u, B_v, G)$ is defined to be true iff $A_u$ and
+$B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$
+($B_v$) needs to be isomorphic with some $\mathcal{N}_r$ and
+$\mathcal{D}(u,v)= d$. We denote $R^{-1}$ as the inverse relation that returns
+subgraphs of $G$, $R^{-1}_{r,d}(G) = \lbrace A_u, B_v |
+R_{r,d}(A_u,B_v,G)\rbrace$. The kernel $\kappa_{r,d}$ over $\mathcal{G} \times
+\mathcal{G}$ takes into account the number of identical neighboring graph
+pairs with radius $r$ at distance $d$ between two graph and is formulated as:
+\begin{center}  $\kappa_{r,d}(G,G^{'}) = \!\!\!\!\!\!\!\!\!\!\!\!
+\sum\limits_{\substack{A_v, B_u \ \in \ R_{r,d}^{-1}(G) \\ {A'}_{v'},
+{B'}_{u'} \ \in \ R_{r,d}^{-1}(G') }} \!\!\!\!\!\!\!\!\!\!\!\!  { {
+\textbf{1}_{A_{v} \cong A'_{v'}}} \cdot { \textbf{1}_{B_{u} \cong B'_{u'}}}
+}$, \end{center} where $\textbf{1}_{A \cong B}$ is the \textit{exact matching
+function} that returns 1 if $A$ is isomorphic to $B$ and 0 otherwise. In order
+to solve the graph isomorphism problem, an efficient approximate algorithm is
+also proposed in \cite{nspdk}. Finally, the NSPDK is defined as $K(G,G') =
+\sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$. For efficiency issue,
+the values of $r$ and $d$ are upper bounded to a given $r^*$ and $d^*$,
+respectively.
 
 \subsubsection{The Conjunctive Disjunctive Node Kernel}
-In this section, we describe our proposed kernel, CDNK, which is a modification of NSPDK to measure the node similarity in the graph which consists of conjunctive and disjunctive edges. In our kernel, we consider only conjunctive edges when computing the distance between nodes and extracting neighborhood subgraphs. We define two relations: the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$, (ii) $\mathcal{D}(u,v)= d$; and the \textit{disjunctive relation} $R_{r,d}^{\vee}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$,  (ii) there exists a vertex $w$ such that $\mathcal{D}(u,w)= d$, (iii) $(w,v)$ is a disjunctive edge.
+
+In our kernel, we consider only conjunctive edges when computing the distance
+between nodes and extracting neighborhood subgraphs. We define two relations:
+the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G)$ to be true
+iff (i) $A_u$ and $B_v$ are in $\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$,
+where $A_u$ ($B_v$) needs to be isomorphic with some $\mathcal{N}_r$, (ii)
+$\mathcal{D}(u,v)= d$; and the \textit{disjunctive relation}
+$R_{r,d}^{\vee}(A_u, B_v, G)$ to be true iff (i) $A_u$ and $B_v$ are in
+$\lbrace \mathcal{N}_r^v: v \in V(G) \rbrace$, where $A_u$ ($B_v$) needs to be
+isomorphic with some $\mathcal{N}_r$,  (ii) there exists a vertex $w$ such
+that $\mathcal{D}(u,w)= d$, (iii) $(w,v)$ is a disjunctive edge.
 
 We define $\kappa_{r,d}$, an instance of the DGK on the relation $R^{\wedge}_{r,d}$ and $R^{\vee}_{r,d}$ as
 \begin{center}
@@ -234,10 +258,35 @@ We perform an empirical evaluation of the predictive performance of several kern
 \subsection{Evaluation Methods}
 We evaluate the performance of graph node kernels in the gene prioritization problem. Given a set of genes known to be associated to a given disease, gene prioritization is a task that aims to rank the candidate genes based on their probabilities to be related to that disease.
 
-Similar to the evaluation process used in \cite{medk}, we choose 12 diseases in which each one contains at least 30 confirmed genes. For each disease, we construct a positive set $\mathcal{P}$ and a negative set $\mathcal{N}$. The set $\mathcal{P}$ consists of all disease gene members. The set $\mathcal{N}$ is built by randomly picking genes from known disease genes, genes associated at least to one disease class, but not related to the current class, such that $\vert \mathcal{N} \vert = \frac{1}{2} \vert \mathcal{P} \vert$. After that, leave-one-out cross validation is used to evaluate the performance of the algorithm. Each turn one gene is out to be the test gene and the rest are used to train the model using SVM. Starting from the output scores, we compute a decision score $q_i$ for the test gene $g_i$ as the top percentage value of score $s_i$ among all scores. $q_{i} = \frac{\vert \{j\vert s_{i} \geq s_{j}  \rbrace \vert}{N}, i = 1,2,\ldots,N$, where $s_i$, $s_j$ are scores, N is the length of gene list. We collect all decision scores for every gene in the training set of a disease to form a global decision score list. The performance of the algorithm is measured by using AUC calculated that list. 
+Similar to the evaluation process used in \cite{medk}, we choose 12 diseases
+in which each one contains at least 30 confirmed genes. For each disease, we
+construct a positive set $\mathcal{P}$ and a negative set $\mathcal{N}$. The
+set $\mathcal{P}$ consists of all disease gene members. The set $\mathcal{N}$
+is built by randomly picking genes from known disease genes, genes associated
+at least to one disease class, but not related to the current class, such that
+$\vert \mathcal{N} \vert = \frac{1}{2} \vert \mathcal{P} \vert$. After that,
+leave-one-out cross validation is used to evaluate the performance of the
+algorithm. Each turn one gene is out to be the test gene and the rest are used
+to train the model using SVM. Starting from the output scores, we compute a
+decision score $q_i$ for the test gene $g_i$ as the top percentage value of
+score $s_i$ among all scores. $q_{i} = \frac{\vert \{j\vert s_{i} \geq s_{j}
+\rbrace \vert}{N}, i = 1,2,\ldots,N$, where $s_i$, $s_j$ are scores, N is the
+length of gene list. We collect all decision scores for every gene in the
+training set of a disease to form a global decision score list. The
+performance of the algorithm is measured by using AUC calculated that list.
 
 \subsection{Parameter Selection}
-In order to select the optimal parameter values for each kernel, we use one disease gene set for parameter selection and use Kfold with \textit{k} equals to 3. We set the values for diffusion parameter in DK and MED as $\lbrace 10^{-3}, 10^{-3}, 10^{-2}, 10^{-1} \rbrace$, for time steps in MD as $\lbrace 1, 10, 100 \rbrace$ and for RL parameter as $\lbrace 1, 4, 7 \rbrace$. For CDNK, we set values for degree threshold in $\lbrace 10,\ 15,\ 20 \rbrace$, clique size threshold in $\lbrace 4,\ 5 \rbrace$, maximum radius in $\lbrace 1,\ 2 \rbrace$, maximum distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Finally, the $C$ of SVM is set as $\lbrace 10^{-5},  \ 10^{-4}, \ 10^{-3},\ 10^{-2},\ 10^{-1},\ 1,\ 10,\ 10^2 \rbrace$.
+
+In order to select the optimal parameter values for each kernel, we use one
+disease gene set for parameter selection and use Kfold with \textit{k} equals
+to 3. We set the values for diffusion parameter in DK and MED as $\lbrace
+10^{-3}, 10^{-3}, 10^{-2}, 10^{-1} \rbrace$, for time steps in MD as $\lbrace
+1, 10, 100 \rbrace$ and for RL parameter as $\lbrace 1, 4, 7 \rbrace$. For
+CDNK, we set values for degree threshold in $\lbrace 10,\ 15,\ 20 \rbrace$,
+clique size threshold in $\lbrace 4,\ 5 \rbrace$, maximum radius in $\lbrace
+1,\ 2 \rbrace$, maximum distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Finally, the
+$C$ of SVM is set as $\lbrace 10^{-5},  \ 10^{-4}, \ 10^{-3},\ 10^{-2},\
+10^{-1},\ 1,\ 10,\ 10^2 \rbrace$.
 
 \section{Results and Discussion}
 \label{results_discussion}
@@ -303,9 +352,10 @@ The CDNK shows the state of the art results. However, in the case that the input
 \section{Conclusions} \label{conclusions} We have shown how decomposing a
 network in a set of connected sparse graphs allows us to take advantage of the
 greater discriminative power of CDNK, a novel decomposition kernel, and
-achieve state- of-the-art results. In future work we will investigate how to
+achieve state-of-the-art results. In future work we will investigate how to
 extend the CDNK approach to gene-disease association problems exploiting
-multiple heterogeneous information sources.
+multiple heterogeneous information sources and we will investigate data driven
+methods to define network decompositions.
 
 \begin{footnotesize}
 
