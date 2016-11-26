@@ -81,7 +81,7 @@ graph kernel methods have become a prominent approach for association
 prediction, most solutions are based on a notion of information diffusion that
 does not capture the specificity of different network parts. Here we propose a
 graph kernel method that explicitly models the configuration of each gene's
-context. An empirical evaluation on several biological databases show that our
+context. An empirical evaluation on several biological databases shows that our
 proposal is competitive w.r.t. state-of-the-art kernel approaches.
 \end{abstract}
 
@@ -153,7 +153,7 @@ We perform an empirical evaluation of the predictive performance of several kern
 To evaluate the performance of graph node kernels we analyze the {\em gene prioritization}, i.e. given a set of genes known to be associated to a given disease, gene prioritization is the task to rank the candidate genes based on their probabilities to be related to that disease. Similar to the evaluation process used in \cite{medk}, we choose 12 diseases with at least 30 confirmed genes. For each disease, we construct a positive set $\mathcal{P}$ with all confirmed disease genes, and a negative set $\mathcal{N}$ which contains random genes associated at least to one disease class which is not related to the class that is defining the positive set. In \cite{medk} the ratio between the dataset sizes is chosen as $\vert \mathcal{N} \vert =
 \frac{1}{2} \vert \mathcal{P} \vert$. The predictive performance of each method is evaluated via a leave-one-out cross validation: one gene is kept out in turn and the rest are used to train an SVM model. We compute a decision score $q_i$ for the test gene $g_i$ as the top percentage value of score $s_i$ among all candidate gene scores. We collect all decision scores for every gene in the training set to form a global decision score list on which we compute the AUC ROC.
 
-\textbf{Model Selection.}
+\textbf{Model Selection:}
 The hyper parameters of the various methods are set using a k-fold on a dataset set that is then never used in the predictive performance estimate. We try the values for diffusion parameter in DK and MED in $\lbrace 10^{-3}, 10^{-3}, 10^{-2}, 10^{-1} \rbrace$, time steps in MD in $\lbrace 1, 10, 100 \rbrace$ and RL parameter in $\lbrace 1, 4, 7 \rbrace$. For CDNK, we try for the degree threshold values in $\lbrace 10,\ 15,\ 20 \rbrace$, clique size threshold in $\lbrace 4,\ 5 \rbrace$, maximum radius in $\lbrace 1,\ 2 \rbrace$, maximum distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Finally, the regularization trade off parameter $C$ for the SVM is searched in $\lbrace 10^{-5},  \ 10^{-4}, \ 10^{-3},\ 10^{-2},\ 10^{-1}, 1,\ 10,\ 10^2 \rbrace$.
 
 
