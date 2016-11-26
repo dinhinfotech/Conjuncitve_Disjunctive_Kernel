@@ -246,17 +246,21 @@ endpoints are only considered in a pairwise fashion and not jointly.
 
 Formally, we define two relations: the \textit{conjunctive relation}
 $R^{\wedge}_{r,d}(A_u, B_v, G_u)$\footnote{This is identical to the NSPDK relation $R_{r,d}(A_u, B_v, G)$ .}  is true iff (i) $A_u \cong \mathcal{N}_r^u$ is a neighborhood subgraph of radius $r$ of $G_u$ and so is $B_v \cong \mathcal{N}_r^u$,  and (ii) $\mathcal{D}(u,v)= d$; the
-\textit{disjunctive relation} $R_{r,d}^{\vee}(A_u, B_v, G)$ is true iff (i)
+\textit{disjunctive relation} $R_{r,d}^{\vee}(A_u, B_v, G)$ is true iff (i)  $A_u \cong \mathcal{N}_r^u$, $B_v \cong \mathcal{N}_r^u$
 is true, (ii) there
 exists a vertex $w$ such that $\mathcal{D}(w,v)= d$, and (iii) $(u,w)$ is a
 disjunctive edge. We define $\kappa_{r,d}$ on the  inverse relations ${R^{\wedge}_{r,d}}^{ -1}$
 and ${R^{\vee}_{r,d}}^{ -1}$
 
 \begin{center}
- $\kappa_{r,d}(G_u,G_{u'}) = \!\!\!\!\!\!\!\!\!\!\!\! \sum\limits_{\substack
- {A_u,\ {B}_{v} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G_u)\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G_u)) \\
-  A'_{u'},\ {B'}_{v'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G_{u'})\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G_{u'})) }} \!\!\!\!\!\!\!\!\!\!\!\!
-  { \textbf{1}_{A_u \cong A_{u'}} \cdot { \textbf{1}_{B_{v} \cong B'_{v'}}}}$,
+ $\kappa_{r,d}(G_u,G_{u'}) = \!\!\!\!\!\!\!\!\!\!\!\!
+ \sum\limits_{\substack {A_u,\ {B}_{v} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G_u) \\ A'_{u'},\ {B'}_{v'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G_{u'}) }} \!\!\!\!\!\!\!\!\!\!\!\!
+  { \textbf{1}_{A_u \cong A_{u'}} \cdot { \textbf{1}_{B_{v} \cong B'_{v'}}}}
++ \!\!\!\!\!\!\!\!\!\!\!\!
+ \sum\limits_{\substack {A_u,\ {B}_{v} \ \in \ ({R_{r,d}^{\vee}}^{ -1}(G_u) \\
+  A'_{u'},\ {B'}_{v'} \ \in \ ({R_{r,d}^{\vee}}^{ -1}(G_{u'}) }} \!\!\!\!\!\!\!\!\!\!\!\!
+  { \textbf{1}_{A_u \cong A_{u'}} \cdot { \textbf{1}_{B_{v} \cong B'_{v'}}}}
+  $,
 \end{center}
 $\kappa_{r,d}$ counts the number of identical pairs of neighboring graphs of radius $r$ at a distance $d$ between two vertices. The CDNK is finally defined as 
 $K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}.$
