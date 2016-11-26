@@ -123,8 +123,9 @@ $\kappa_{r,d}(G,G^{'}) =
 \end{center} 
 \noindent where $\textbf{1}_{A \cong B}$ is the \textit{exact matching function} that returns 1 if $A$ is
 isomorphic to $B$ and 0 otherwise.  Finally, the NSPDK is defined as $K(G,G') = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$, where for efficiency reasons, the values of $r$ and $d$ are upper bounded to a given $r^*$ and $d^*$, respectively.
+
 \subsubsection{The Conjunctive Disjunctive Node Kernel}
-We extend NSPDK and define a kernel $K(G_u,G_{u'})$ between two copies of the same network $G$ where we distinguish the nodes $u$ and $u'$ respectively. The idea is to define the features of a node $u$ as the subset of NSPDK features that always have the node $u$ as one of the roots. In addition we distinguish between two types of edges, termed {\em conjunctive} and {\em disjunctive} edges. We consider only conjunctive edges when computing distances and hence when we induce neighborhood subgraphs. When choosing the
+We extend NSPDK and define a node kernel $K(G_u,G_{u'})$ between two copies of the same network $G$ where we distinguish the nodes $u$ and $u'$ respectively. The idea is to define the features of a node $u$ as the subset of NSPDK features that always have the node $u$ as one of the roots. In addition we distinguish between two types of edges, termed {\em conjunctive} and {\em disjunctive} edges. We consider only conjunctive edges when computing distances and hence when we induce neighborhood subgraphs. When choosing the
 pair of neighborhoods to form a single feature, we additionally consider roots $u$ and $v$ that are not at distance $d$ but such that $u$ is connected to $w$ via a disjunctive edge and such that $w$ is at distance $d$ from $v$. In this way disjunctive edges can still allow an 'information flow' even if their
 endpoints are only considered in a pairwise fashion and not jointly. 
 
@@ -140,6 +141,7 @@ Formally, we define two relations: the \textit{conjunctive relation} $R^{\wedge}
   $.
 \end{center}
 The CDNK is finally defined as $K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}.$ where once again for efficiency reasons, the values of $r$ and $d$ are upper bounded to a given $r^*$ and $d^*$.
+
 \section{Evaluation}
 \label{evaluation}
 We perform an empirical evaluation of the predictive performance of several kernel based methods on two of the databases used in \cite{medk}.
