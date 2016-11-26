@@ -124,9 +124,7 @@ We start from the type of similarity notion computed by decomposition kernels
 between graph instances and adapt it to express the similarity between nodes
 in a single network. In this work we use three key ideas: 1) genes are labeled
 using their functional profile, 2) we transform the network to distinguish
-highly connected components from sparsely connected ones, and 3) we transform
-the neighborhood of each gene in a sparse high dimensional vector that can be
-easily processed by standard machine learning techniques such as SVMs.
+highly connected components from sparsely connected ones, and 3) we compute the similarity between gene's neighborhoods using graph kernel techniques.
 
 \subsection{Gene Labeling} Gene-disease associations networks typically
 represent genes as nodes labeled with a gene identifier. Here we take a
