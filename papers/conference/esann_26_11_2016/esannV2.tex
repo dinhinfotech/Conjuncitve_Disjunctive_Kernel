@@ -232,7 +232,7 @@ $d^*$, respectively.
 \subsubsection{The Conjunctive Disjunctive Node Kernel}
 
 We extend NSPDK and define a kernel $K(G_u,G_{u'})$ between two copies of the
-same network $G$ where we distinguish the nodes $u$ and $v$ respectively. The
+same network $G$ where we distinguish the nodes $u$ and $u'$ respectively. The
 idea is to define the features of a node $u$ as the subset of NSPDK features
 that always have the vertex $u$ as one of the roots. In addition we
 distinguish between two types of edges, termed {\em conjunctive} and {\em
@@ -253,7 +253,7 @@ disjunctive edge. We define $\kappa_{r,d}$ on the  inverse relations ${R^{\wedge
 and ${R^{\vee}_{r,d}}^{ -1}$
 
 \begin{center}
- $\kappa_{r,d}(G_u,G_v) = \!\!\!\!\!\!\!\!\!\!\!\! \sum\limits_{\substack
+ $\kappa_{r,d}(G_u,G_u') = \!\!\!\!\!\!\!\!\!\!\!\! \sum\limits_{\substack
  {A_u,\ {B}_{v} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G_u)\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G_u)) \\
   A'_{u'},\ {B'}_{v'} \ \in \ ({R_{r,d}^{\wedge}}^{ -1}(G_{u'})\ \cup\  {R_{r,d}^{\vee}}^{ -1}(G_{u'})) }} \!\!\!\!\!\!\!\!\!\!\!\!
   { \textbf{1}_{A_u \cong A_{u'}}.{ \textbf{1}_{B_{v} \cong B'_{v'}}}}$,
