@@ -64,8 +64,8 @@ Trieste, 63, 35121 Padova, Italy
 %
 % Remove the next three lines in case of a single institution
 \vspace{.1cm}\\
-2- Bioinformatics Group, Department of Computer Science, Freiburg University \\
-Georges-Kohler-Allee 106, 79110 Freiburg, Germany\\
+2- Department of Computer Science, University of Exeter \\
+Exeter EX4 4QF, UK\\
 }
 %***********************************************************************
 % END OF AUTHORS INFORMATION AREA
@@ -94,12 +94,12 @@ pairwise co-occurrence of the genes at the endpoints. The aim of the following d
 at a distance no greater than $r$ from $v$ and denoted by $N_r(v)$. The \textit{neighborhood subgraph} with radius $r$ of node $v$, denoted by $\mathcal{N}_{r}^{v}$,  is the subgraph formed by the nodes in the
 neighborhood with radius $r$ of $v$ and the relative edges with endpoints in $N_r(v)$.
 
-\textit{K-core decomposition} \cite{kcore}: The node set is partitioned in two groups on the basis of the degree of each node w.r.t. a threshold degree $D$. The node partition is used to induce the conjunctive vs disjunctive edge partition: edges that have endpoints in the same part are marked as conjunctive, while edges with endpoints in different parts are marked as disjunctive. We apply the k-core decomposition iteratively considering only the graph induced by the conjunctive edges until no node has a degree \footnote{The degree is defined by only considering incident conjunctive edges.}greater than $D$.
+\textit{Iterative k-core decomposition} \cite{kcore}: The node set is partitioned in two groups on the basis of the degree of each node w.r.t. a threshold degree $D$. The node partition is used to induce the conjunctive vs disjunctive edge partition: edges that have endpoints in the same part are marked as conjunctive, while edges with endpoints in different parts are marked as disjunctive. We apply the k-core decomposition iteratively considering only the graph induced by the conjunctive edges until no node has a degree \footnote{The degree is defined by only considering incident conjunctive edges.}greater than $D$.
 
 
-\textit{Clique decomposition} \cite{clique}: All the cliques (completely connected subgraphs) with a number of nodes greater than a threshold size $C$ are identified. Nodes in a clique seem to share same properties. Therefore, a new 'representative' node is added to the network for each clique. The endpoints of all edges incident on the clique's nodes are transferred to the representative node. Disjunctive edges are introduced to connect each node in the clique to the representative. Finally all edges with both endpoints in the clique are removed.
+\textit{Clique decomposition} \cite{clique}: To model the notion that nodes in a clique are tightly related, we summarize the whole clique with a new 'representative' node. All the cliques (completely connected subgraphs) with a number of nodes greater than a threshold size $C$ are identified. The endpoints of all edges incident on the clique's nodes are transferred to the representative node. Disjunctive edges are introduced to connect each node in the clique to the representative. Finally all edges with both endpoints in the clique are removed.
 
-In our work a network is transformed by applying first the k-core decomposition and then the clique decomposition.
+In our work a network is transformed by applying first the iterative k-core decomposition and then the clique decomposition.
 
 \subsection{Node Graph Kernels} 
 We start from the Neighborhood Subgraph Pairwise Distance Kernel (NSPDK) \cite{nspdk} and adapt it to express the similarity between nodes in a single network. The key idea in NSPDK is to decompose graphs in small fragments and count how many pairs of fragments are shared between two instances. We introduce two improvements: 1) we partition the features according to the individual node's neighborhood, and 2) feature construction distinguishes between disjunctive and conjunctive edges.
