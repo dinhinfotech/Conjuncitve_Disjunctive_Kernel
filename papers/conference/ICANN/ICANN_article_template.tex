@@ -1,0 +1,297 @@
+
+%%%%%%%%%%%%%%%%%%%%%%% file typeinst.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is the LaTeX source for the instructions to authors using
+% the LaTeX document class 'llncs.cls' for contributions to
+% the Lecture Notes in Computer Sciences series.
+% http://www.springer.com/lncs       Springer Heidelberg 2006/05/04
+%
+% It may be used as a template for your own input - copy it
+% to a new file with a new name and use it as the basis
+% for your article.
+%
+% NB: the document class 'llncs' has its own and detailed documentation, see
+% ftp://ftp.springer.de/data/pubftp/pub/tex/latex/llncs/latex2e/llncsdoc.pdf
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\documentclass[runningheads,a4paper]{llncs}
+
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+
+\usepackage{url}
+\urldef{\mailsa}\path|{alfred.hofmann, ursula.barth, ingrid.haas, frank.holzwarth,|
+\urldef{\mailsb}\path|anna.kramer, leonie.kunz, christine.reiss, nicole.sator,|
+\urldef{\mailsc}\path|erika.siebert-cole, peter.strasser, lncs}@springer.com|    
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+
+\begin{document}
+
+\mainmatter  % start of an individual contribution
+
+% first the title is needed
+\title{A Method for Strengthening Diffusion-based Graph Node Kernels}
+
+% a short form should be given in case it is too long for the running head
+\titlerunning{A Method for Strengthening Diffusion-based Graph Node Kernels}
+
+% the name(s) of the author(s) follow(s) next
+%
+% NB: Chinese authors should write their first names(s) in front of
+% their surnames. This ensures that the names appear correctly in
+% the running heads and the author index.
+%
+\author{Dinh Tran-Van \and Alessandro Sperduti\and Fabrizio Costa}
+%\thanks{Please note that the LNCS Editorial assumes that all authors have used
+%the western naming convention, with given names preceding surnames. This determines
+%the structure of the names in the running heads and the author index.}%
+
+%
+\authorrunning{A Method for Strengthening Diffusion-based Graph Node Kernels}
+% (feature abused for this document to repeat the title also on left hand pages)
+
+% the affiliations are given next; don't give your e-mail address
+% unless you accept that it will be published
+\institute{Department of Mathematics, Padova University
+Trieste, 63, 35121 Padova, Italy\\
+Department of Computer Science, University of Exeter
+Exeter EX4 4QF, UK\\
+$\lbrace$dinh, sperduti$\rbrace$@math.unipd.it, f.costa@exeter.ac.uk\\
+\url{http://www.math.unipd.it}}
+
+%
+% NB: a more complex sample for affiliations and the mapping to the
+% corresponding authors can be found in the file "llncs.dem"
+% (search for the string "\mainmatter" where a contribution starts).
+% "llncs.dem" accompanies the document class "llncs.cls".
+%
+
+\toctitle{Lecture Notes in Computer Science}
+\tocauthor{Authors' Instructions}
+\maketitle
+
+
+\begin{abstract}
+Node similarity measurement is one of the key points which determines the performance of graph-based learning systems. Diffusion-based graph node kernels are commonly used in many applications to capture the node similarity. However, they only show promissing results in the case of using dense graphs. In this paper, we propose a method that aims to strengthen diffusion-based kernels when working with sparse graphs by employing link enrichment. The empirical experiments show that our method considerably improves the power of diffusion-based graph node kernels. 
+
+\keywords{Graph node kernels, diffusion-based kernels, link enrichment, disease gene prioritization}
+\end{abstract}
+
+
+\section{Introduction}
+
+Recently, with the fast development of science and technology, we have witnessed the rapid growth of data in terms of both volume and variety. In order to efficiently extract knowledge from those huge data, a number of learning systems have been introduced. Each system takes specific types of data to preceed. Graph is a widely used data representation and is employed in many systems of different domains \cite{proceeding1}, \cite{jour1}. Learning systems used graphs as their input are referred as graph-based learning systems.
+
+In graph-based systems, the measurement of node proximity is one of the key factor that determines the performace of the systems. The most common paradigm used to capture node similarity is graph node kernels. Graph node kernel is a paradigm which allows to define similarity between any couple of graph nodes in a normally high dimensional space. As a consequence, considerable graph node kernels have been proposed and applied in many applications, domains. Among them, diffusion-based kernels \footnote{A diffusion-based graph node kernel measures the proximity between any couple of nodes by taking into account paths connecting them.} are the most commonly employed and they show promissing results. However, those node kernels usually show good performance only when dealing with dense graphs - graphs with high value of average node degree node. And, vice versa in the case of working with sparse graphs - graphs with low value of average node degree node - they usually lead to poor performance of systems. This is due to (1) the number of links in the graph is very limitted comparing to the complete graph, so the information cannot be well diffused. (2) the lack of links also causes the fragment problem to the graph. In this case, the information cannot diffused between isolated components. Therefore, the similarity between nodes located in different isolated components measured by diffusion-based graph node kernels is equal to zero. As a consequence, it raises challenge for us if we desire to build good graph-based learning systems. To overcome this problem, we come up with the idea of using link enrichment. Link enrichment is a task that aims at predicting the most probable candidate links to be considered as missing links to add into graphs. Many link prediction methods have been proposed. In \cite{jour2}, a roughly exhaused study of link prediction methods is presented in which they classify methods into different groups. The most widely used framework is the similarity-based algorithms because of the ease and effectiveness. In those methods, each pair of nodes is assigned a score which is directly defined as the similarity between nodes.
+
+To the best of our knowledge, there is no investigation that has been done to boost the performance of diffusion-based kernels by using link enrichment. Therefore, in this paper, we present a method that intends to strengthen the power of diffusion-based graph node kernels by employing link enrichment paradigm. An evaluation on different real datasets confirms that our proposed method is notable when using diffusion-based graph node kernels.
+
+This paper is organized as follows: we first introduce the notaion and background in the section \ref{background}. We then describe our proposed method in section \ref{method}. The evaluation and results are presented in section \ref{evaluation} and section \ref{results-discussion}, respectively. Finally, the conclusion is writen in section \ref{conclusion}.
+
+\section{Notation and Background}
+\label{background}
+Let us consider an undirected graph $G = (V, E)$ in which $V$ represents for a set of entities (vertices)  and $E$ characterizes the entity relationships (links). The adjacency matrix $A$ is a symmetric matrix used to describe the direct links between vertices $v_{i}$ and $v_{j}$ in the graph. Any entry $A_{ij}$ is equal to 1 when there exists a link connecting $v_{i}$ and $v_{j}$, and is 0 otherwise. The Laplacian matrix $L$ is defined as $L = D-A$, where $D$ is the diagonal matrix with non-null entries equal to the summation over the corresponding row of the adjacency matrix, i.e. $D_{ii}=\sum_j A_{ij}$. The rest of the paper are described under this notation convention. 
+\subsection{Graph Node Kernels}
+A graph node kernel is a kernel which is designed to measure the similarity of between any node couple. There is a number of graph node kernels which have been proposed and applied in many applications of different fields. Most graph node kernels belong to one of the two popular frameworks: Diffusion-based graph node kernels and decomposition graph node kernels. 
+
+Diffusion-based kernels can be considered as the modifications of laplacian diffusion kernel \cite{proceeding2}. These kernels measure the node proximity between any couple of nodes by taking into account the paths connecting them. They normally show promissing performance in case of dealing with dense graphs because of their ability to capture the global similarity. However, they poorly demonstrate when working with sparse graphs which consist of a low number number of links and high number of disconnected components. Following, we briefly describe some of the most popular diffusion-based graph node kernels.
+\begin{itemize}
+\item \textit{Laplacian exponential diffusion kernel:} One of the most well-known kernels for graphs is the Laplacian exponential diffusion kernel (LEDK), as it is widely used for exploiting discrete structures in general and graphs in particular. On the basis of the heat diffusion dynamics, Kondor and Lafferty proposed LEDK in \cite{proceeding2}: imagine to initialize each vertex with a given amount of heat and let it flow through the edges until an arbitrary instant of time. The similarity between any vertex couple $v_{i}$, $v_{j}$ is the amount of heat starting from $v_{i}$ and reaching $v_{j}$ within the given time. Therefore, LEDK can capture the long range relationship between vertices of a graph to define the global similarities. Below is the formula to compute LEDK values:
+\begin{equation}
+K_{LEDK} = e^{-\beta L},
+\end{equation}
+where $\beta$ is the diffusion parameter and is used to control the rate of diffusion. Choosing a consistent value for $\beta$ is very important: on the one side, if $\beta$ is too small, the local information cannot be diffused effectively and, on the other side, if it is too large, the local information will be lost. $K_{LEDK}$ is positive semi-definite as proved in \cite{proceeding2}.
+
+\item \textit{Markov exponential diffusion kernel:} In LEDK, similarity values between high degree vertices is generally higher compared to that between low degree ones. Intuitively, the more paths connect two vertices, the more heat can flow between them. This could be problematic since peripheral nodes have unbalanced similarities with respect to central nodes. In order to make the strength of individual vertices comparable, a modified version of LEDK is introduced by Chen et al in \cite{proceeding3}, called Markov exponential diffusion kernel MEDK and given by the following formula:
+\begin{equation}
+K_{MEDK} = e^{-\beta M}.
+\end{equation}
+The difference with respect to the LEDK is the replacement of \textit{L} by the matrix $M = (D-A-nI)/n$ where \textit{n} is the total number of vertices in graph. The role of $\beta$ is the same as for LEDK.
+
+\item \textit{Markov diffusion kernel:} The original Markov diffusion kernel MDK is introduced by Fouss et al. \cite{jour3}. It exploits the idea of diffusion distance, which is a measure of how similar the pattern of heat diffusion is among a pair of initialized nodes. In other words, it expresses how much nodes "influence" each other in a similar fashion. If their diffusion ways are alike, the similarity will be high and, vice versa, it will be low if they diffuse differently. This kernel is computed starting from the transition matrix \textit{P} and by defining $Z(t) = \frac{1}{t}\sum_{\tau=1}^{t} P^{\tau}$, as follows:
+\begin{equation}
+K_{MDK} = Z(t) Z^{\top}(t)
+\end{equation}
+
+\item \textit{Regularized Laplacian kernel:} Another popular graph node kernel function used in graph mining is the regularized Laplacian kernel (RLK). This kernel function was introduced by Chebotarev and Shamis in \cite{rlk} and represents a normalized version of the random walk with restart model. It is defined as follows:
+\begin{equation}
+K_{RLK} = \sum_{n=0}^{\infty}\beta^{n}(-L)^n
+\end{equation}
+where the parameter $\beta$ is again the diffusion parameter. RLK counts the paths connecting two nodes on the graph induced by taking \textit{-L} as the adjacency matrix, regardless of the path length. Thus, a non-zero value is assigned to any couple of nodes as long as they are connected by any indirect path. $K_{RLK}$ remains a relatedness measure even when diffusion factor is large, by virtue of the negative weights assigned to self-loops.
+\end{itemize}
+Decomposition graph node kernels take the idea from \cite{?} in which the similarity function between two graphs can be formed by decomposing each graph into subgraphs and by devising a valid local kernel between the subgraphs. This idea is then adjusted to measure graph node similarity by considering the neighborhood subgraph rooted at a vertex as its graph to compute. In order to form this kind of kernel, we need to face with graph matching problem or graph isomorphic problem which is not known to be solvable in polynomial time nor to be NP-complete. An advantage of using decomposition kernels is the possibility to have non-zero similarity value for node couples locate in distinct disconnected components of graph. Hereafter, we depict one of the novel decomposition graph node kernel named The conjunctive and disjunctive node kernel (CDNK) which is proposed in \cite{?}.
+
+The conjuctive disjuctive node kernel is an extension of NSPDK \cite{?}, which is an instance of convolution kernel (decomposition kernel). This kernel aims to define the the kernel $K(G_u, G_{u'})$ similarity between two copies of the same graph where $G_u$ and $G_{u'}$ are graphs rooted at $u$ and $u'$, respectively. In the method, they utilize two types of edge named \textit{conjuctive} and \textit{disjunctive}. Nodes linked by conjunctive edges are going to be used jointly to define the notion of context. Nodes linked by disjunctive edges are instead used to define features based only on the pairwise co-occurrence of the genes at the endpoints.
+
+Formally, they define two relations: the \textit{conjunctive relation} $R^{\wedge}_{r,d}(A_u, B_v, G_u)$ is true iff (i) $A_u \cong \mathcal{N}_r^u$ is a neighborhood subgraph of radius $r$ of $G_u$ and so is $B_v \cong \mathcal{N}_r^v$,  and (ii) $\mathcal{D}(u,v)= d$; the \textit{disjunctive relation} $R_{r,d}^{\vee}(A_u, B_v, G_u)$ is true iff (i)  $A_u \cong \mathcal{N}_r^u$ and $B_v \cong \mathcal{N}_r^u$ are true, (ii) $\exists w$ s.t. $\mathcal{D}(w,v)= d$, and (iii) $(u,w)$ is a disjunctive edge. They define $\kappa_{r,d}$ on the  inverse relations ${R^{\wedge}_{r,d}}^{ -1}$ and ${R^{\vee}_{r,d}}^{ -1}$:
+
+% $\kappa_{r,d}(G_u,G_{u'}) = \sum\limits_{\substack {A_u,{B}_{v} \in {R_{r,d}^{\wedge}}^{ -1}(G_u) \\ A'_{u'},{B'}_{v'} \in {R_{r,d}^{\wedge}}^{ -1}(G_{u'}) }} { \textbf{1}_{A_u \cong A'_{u'}} \cdot { \textbf{1}_{B_{v} \cong B'_{v'}}}} + $
+
+%\begin{flushright}
+% $\sum\limits_{\substack {A_u,{B}_{v} \in {R_{r,d}^{\vee}}^{ -1}(G_u) \\
+%  A'_{u'},{B'}_{v'} \in \ {R_{r,d}^{\vee}}^{ -1}(G_{u'}) }} \!\!\!\!\!\!\!\!\!\!\!\! 
+%  { \textbf{1}_{A_u \cong A'_{u'}} \cdot { \textbf{1}_{B_{v} \cong B'_{v'}}}}$
+%\end{flushright}
+%
+%The CDNK is finally defined as $K(G_u,G_v) = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G_u,G_v)}}$, where once again for efficiency reasons, the values of $r$ and $d$ are upper bounded to a given $r^*$ and $d^*$.
+
+\subsection{Link Enrichment}
+\label{link-enrichment}
+Information encoded in data are usually incomplete. In many cases, this leads to the sparse or even very sparse graphs when using them to present for data. As a consequence, the graph-based systems show with poor performance. Link enrichment (link prediction) is a task that intends to add the most likely non-observed links into graphs. A considerable number of link prediction methods which have been proposed. These methods can be classified into different categories as presented in \cite{?}. 
+\begin{itemize}
+\item \textit{Similarity-based algorithms:} This is the simplist framework for link prediction. In these methods, each non-observed link of a graph is assigned a score. This score is then directly used as the proximity between starting and ending nodes of that link. In order to define similarity, one can use nodes' attributes. Unfortunately, nodes' attributes are normally hidden. Therefore, most methods are based on the structured similarity [\cite{reference here}]. Graph node kernels also are in this group.
+
+\item \textit{Maximum likelihood methods:} These algorithms presuppose some organizing principles of the network structure, with the detailed rules and specific parameters obtained by maximizing the likelihood of the observed structure. Then, the likelihood of any non-observed link can be calculated according to
+those rules and parameters.
+
+\item \textit{Probabilistic models:} Probabilistic models aim at abstracting the underlying structure from the observed network, and then predicting the missing links by using the learned model. Given a target graph, G, the probabilistic model will optimize a built target function to establish a model composed of a group of parameters $\theta$, which can best fit the observed data of the target network. Then the probability of the existence of a nonexistent link (i, j) is estimated by the conditional probability $P(A_{ij} = 1|\theta)$.
+
+\end{itemize}
+In this paper, we intend to use the global similarity-based algorithms for two reasons. Firtst, among similarity-based algorithms, global ones show better results in general, even the complexity is higher than local and semi-local similarity-based algorithms. Second, it is easier and less complexity to apply comparing with maximum likelihood methods probabilistic models.
+\section{Method}
+\label{method}
+In this section, we describe our proposed method using link enrichment method to strengthen diffusion-based graph node kernels.
+
+Given a graph $G=(V, E)$, our method consists of two pharses:
+\begin{itemize}
+\item Link enrichment: in the first phase, Starting from the graph $G$, we apply one of the link prediction method on $G$ to compute a score for each of non-observed link. This score represents for its probability to be considered as a link in the graph. The non-observed link list is then sorted by their corresponding scores. The top links in the sorted list are added into $G$ to have new graph $G^{'}$.
+\item Kernel computation: in the second phase, we apply diffusion-based graph node kernels to the graph $G^{'}$ to compute kernel matrix which encodes the similarities between any couple of nodes. This kernel matrix can be fit into graph kernel-based learning systems to make inference.
+\end{itemize}
+\section{Evaluation}
+\label{evaluation}
+\subsection{Datasets}
+We perform an empirical evaluation of the predictive performance of several kernel based methods on two of the databases used in \cite{medk}.
+
+\textbf{BioGPS:} a gene co-expression network is constructed from BioGPS dataset, which contains 79 tissues, measured with the Affymetrix U133A array. Edges are inserted when the pairwise Pearson correlation coefficient (PCC) between genes is larger than 0.5.
+
+\textbf{HPRD:} a database of curated proteomic information pertaining to human proteins. It is derived from \cite{hprd} with 9465 vertices and 37039 edges. We enploy the HPRD version used in \cite{medk} in which they remove some vertices to have 7311 vertices at the end.
+\subsection{Evaluation Methods}
+To evaluate the performance of graph node kernels we analyze the {\em gene prioritization}, i.e. given a set of genes known to be associated to a given disease, gene prioritization is the task to rank the candidate genes based on their probabilities to be related to that disease. Similar to the evaluation process used in \cite{medk}, we choose 12 diseases with at least 30 confirmed genes. For each disease, we construct a positive set $\mathcal{P}$ with all confirmed disease genes, and a negative set $\mathcal{N}$ which contains random genes associated at least to one disease class which is not related to the class that is defining the positive set. In \cite{medk} the ratio between the dataset sizes is chosen as $\vert \mathcal{N} \vert = \frac{1}{2} \vert \mathcal{P} \vert$. The predictive performance of each method is evaluated via a leave-one-out cross validation: one gene is kept out in turn and the rest are used to train an SVM model. We compute a decision score $q_i$ for the test gene $g_i$ as the top percentage value of score $s_i$ among all candidate gene scores. We collect all decision scores for every gene in the training set to form a global decision score list on which we compute the AUC ROC.
+\subsection{Model Selection}
+\textbf{Model Selection}
+The hyper parameters of the various methods are set using a k-fold on a dataset set that is then never used in the predictive performance estimate. We try the values for diffusion parameter in DK and MED in $\lbrace 10^{-3}, 10^{-3}, 10^{-2}, 10^{-1} \rbrace$, time steps in MD in $\lbrace 1, 10, 100 \rbrace$ and RL parameter in $\lbrace 1, 4, 7 \rbrace$. For CDNK, we try for the degree threshold values in $\lbrace 10,\ 15,\ 20 \rbrace$, clique size threshold in $\lbrace 4,\ 5 \rbrace$, maximum radius in $\lbrace 1,\ 2 \rbrace$, maximum distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Finally, the $C$ of SVM is searched in $\lbrace 10^{-5},  \ 10^{-4}, \ 10^{-3},\ 10^{-2},\ 10^{-1}, 1,\ 10,\ 10^2 \rbrace$.
+\section{Results and Discussion}
+\label{results-discussion}
+\begin{table*}[!htb]
+%\vspace*{-5pt}
+\centering
+%\setlength{\tabcolsep}{0.7mm}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+         \multicolumn{9}{|c|}{\textbf{HPRD Dataset}}\\
+ \hline
+ & \multicolumn{2}{c|}{\textbf{LEDK}} & \multicolumn{2}{c|}{\textbf{MEDK}} & \multicolumn{2}{c|}{\textbf{MDK}} & \multicolumn{2}{c|}{\textbf{RLK}} \\
+ \hline
+  Disease & No\_Link & Link & No\_Link & Link & No\_Link & Link & No\_Link & Link \\
+ \hline
+  0 & 73/2 & 74/1 & 71/1 & 71/2 & 71/1 & 69/2 & 73/2 & 73/1 \\
+
+  1 & 68/2 & 69/1 & 54/2 & 55/1 & 82/2 & 82/1 & 80/2 & 80/1 \\
+
+  2 & 77/1 & 75/2 & 72/1 & 70/2 & 79/1 & 77/2 & 81/1 & 76/2 \\
+
+  3 & 60/2 & 62/1 & 62/2 & 63/1 & 63/2 & 66/1 & 65/2 & 67/1 \\
+
+  4 & 67/2 & 68/1 & 65/2 & 67/1 & 68/2 & 70/1 & 68/1 & 68/2 \\
+
+  5 & 67/1 & 67/2 & 69/1 & 68/2 & 65/2 & 68/1 & 66/2 & 70/1 \\
+
+  6 & 87/2 & 88/1 & 87/2 & 87/1 & 87/2 & 89/1 & 87/2 & 88/1 \\
+
+  7 & 79/2 & 80/1 & 78/2 & 79/1 & 81/1 & 78/2 & 79/1 & 77/2 \\
+
+  8 & 78/2 & 79/1 & 72/2 & 72/1 & 79/1 & 75/2 & 80/2 & 80/1 \\
+
+  9 & 73/2 & 76/1 & 71/2 & 73/1 & 70/2 & 72/1 & 70/2 & 77/1 \\
+
+  10 & 80/1 & 79/2 & 82/1 & 81/2 & 77/1 & 75/2 & 80/2 & 80/1 \\
+
+  11 & 76/1 & 75/2 & 75/2 & 75/1 & 83/2 & 87/1 & 84/1 & 83/2 \\
+
+ \hline
+  $\overline{AUC}$ & 74/1.67 & 74/1.33 & 71/1.67 & 72/1.33 & 75/1.58 & 76/1.42 & 76/1.67 & 77/1.33 \\
+\hline
+    & & 0.76 & & 0.73 & & 0.76 & & 0.77 \\
+\hline
+\end{tabular}
+\caption{\textit {Predictive performance on 12 gene-disease associations using network induced by the HPRD. We report the AUC-ROC (\%) and the rank for each kernel method.}}
+\label{table:results}
+\end{table*}
+%==============================================
+\begin{table*}[!htb]
+%\vspace*{-5pt}
+\centering
+%\setlength{\tabcolsep}{0.7mm}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+         \multicolumn{9}{|c|}{\textbf{HPRD Dataset}}\\
+ \hline
+ & \multicolumn{2}{c|}{\textbf{LEDK}} & \multicolumn{2}{c|}{\textbf{MEDK}} & \multicolumn{2}{c|}{\textbf{MDK}} & \multicolumn{2}{c|}{\textbf{RLK}} \\
+ \hline
+  Disease & No\_Link & Link & No\_Link & Link & No\_Link & Link & No\_Link & Link \\
+ \hline
+	0 & 73/2 & 76/1 & 76/2 & 79/1 & 70/1 & 69/2 & 70/1 & 67/2 \\
+
+	1 & 60/1 & 61/2 & 59/1 & 58/2 & 60/2 & 61/1 & 60/2 & 72/1 \\
+
+	2 & 85/1 & 84/2 & 85/1 & 84/2 & 82/1 & 82/2 & 82/2 & 84/1 \\
+
+	3 & 66/2 & 67/1 & 56/2 & 60/1 & 66/2 & 69/1 & 66/2 & 67/1 \\
+
+	4 & 61/2 & 62/1 & 63/1 & 62/2 & 58/2 & 58/1 & 58/2 & 58/1 \\
+
+	5 & 70/1 & 69/2 & 70/1 & 69/2 & 67/2 & 68/1 & 67/2 & 68/1 \\
+
+	6 & 73/1 & 71/2 & 68/1 & 68/2 & 69/1 & 69/2 & 69/2 & 76/1 \\
+
+	7 & 69/2 & 69/1 & 69/2 & 69/1 & 67/2 & 67/1 & 67/1 & 65/2 \\
+
+	8 & 73/2 & 74/1 & 70/2 & 71/1 & 65/2 & 68/1 & 65/2 & 67/1 \\
+
+	9 & 69/1 & 67/2 & 65/2 & 66/1 & 64/2 & 65/1 & 64/1 & 64/2 \\
+
+	10 & 58/2 & 60/1 & 52/2 & 56/1 & 60/2 & 61/1 & 60/2 & 70/1 \\
+
+	11 & 69/2 & 73/1 & 70/2 & 70/1 & 60/2 & 61/1 & 60/2 & 62/1 \\
+	
+	\hline
+	\shortstack{$\overline{AUC}$ \\$\overline{Rank}$} & 69/1.58 & 69/1.42 & 67/1.58 & 68/1.42 & 66/1.75 & 67/1.25 & 66/1.75 & 68/1.25 \\
+\hline
+    & & 72 & & 69 & & 68 & & 71 \\      						
+\hline
+\end{tabular}
+\caption{\textit {Predictive performance on 12 gene-disease associations using network induced by the BioGPS. We report the AUC-ROC (\%) and the rank for each kernel method.}}
+\label{table:results}
+\end{table*}
+
+\section{Conclusion}
+\label{conclusion}
+In this paper, we have proposed a novel method to boost the power of diffusion-based graph node kernel by using link enrichment paradigm. The results achieved from empirical experiments illustrate that our proposed method is noticeable when using diffusion-based graph node kernels to build learning systems.
+
+
+% EITHER use the included BST file
+% \bibliographystyle{splncs03}
+% \bibliography{yourbibfile}
+
+% OR include the cited references explicitly
+\begin{thebibliography}{4}
+
+\bibitem{proceeding1} Huang, Z., et al.: A graph-based recommender system for digital library. Proceedings of the 2nd ACM/IEEE-CS joint conference on Digital libraries. ACM, 2002. 
+
+\bibitem{jour1} Ramadan, E., Sadiq A., and Rafiul H.: "Network topology measures for identifying disease-gene association in breast cancer." BMC bioinformatics 17.7 (2016): 274.
+
+\bibitem{jour2} Lu, L., and Tao Z.: Link prediction in complex networks: A survey. Physica A: Statistical Mechanics and its Applications 390.6 (2011): 1150-1170.
+
+\bibitem{proceeding2} Kondor, R. I., and Lafferty J.: Diffusion kernels on graphs and o ther discrete structures." Machine Learning, Proceedings of the 19th International Conference (ICML 2002). 2002.
+
+\bibitem{proceeding3} Chen, B., et al.: Disease gene identification by using graph kernels and Markov random fields. Science China. Life Sciences 57.11 (2014): 1054.
+
+\bibitem{jour3} Fouss, F., et al.: An experimental investigation of kernels on graphs for collaborative recommendation and semisupervised classification. Neural networks 31 (2012): 53-72.
+
+\end{thebibliography}
+
+\end{document}
