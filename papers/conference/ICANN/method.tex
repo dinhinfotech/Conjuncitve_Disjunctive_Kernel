@@ -2,10 +2,29 @@
 
 \section{Method}
 \label{method}
-Information encoded in data is usually incomplete. This usually leads to the sparsity issue when using graphs to represent  data. As a consequence,  graph-based systems which use diffusion-based kernels show limited performances. Therefore, in this section, we describe our proposed method, based on link enrichment, to strengthen diffusion-based graph node kernels, so that the performance of graph-based systems can be improved.
 
-Given a sparse graph $G=(V, E)$ in which $|V| = n$ and $|E| = m$, the proposed method consists of two phases:
+Often the relational information that defines the network structure is
+incomplete because certain relations are not known at a given moment in time
+or have not been yet investigated. When this happens the resulting networks
+tend to become sparse and composed of several disconnected components.
+Diffusion-based kernels are not suited in these cases and show a degraded
+predictive capacity. Our key idea is to introduce a {\em link enrichment
+phase} that can address both issues and enhance the performance of diffusion-based systems.
+
+Given a link prediction algorithm $M$, a diffusion-based graph node kernel $K$
+and a sparse graph $G=(V, E)$ in which $|V| = n$ and $|E| = m$, with $m
+\approx n$ the link enrichment method consists of two phases:
+
 \begin{itemize}
-\item Link enrichment: in the first phase, starting from the graph $G$, we utilize a link prediction method to compute scores for all $\frac{n(n-1)}{2}-m$ candidate links. These scores represent  their probabilities to be considered as a link in the graph. The candidate links are then sorted based on their corresponding scores. The top $t$ links in the sorted link list are added into $G$ to obtain a new enriched graph $G^{'}$.
-\item Kernel computation: in the second phase, we apply the chosen diffusion-based graph node kernel to the achieved graph $G^{'}$ to compute the kernel matrix which encodes the similarities between any couple of nodes. This kernel matrix can then  be used into graph kernel-based learning systems to make inference.
+
+\item enrichment: the link prediction algorithm $M$ is used to score all possible
+$\frac{n(n-1)}{2}-m$ missing links. The top scoring $t$ links are added to $E$
+to obtain $E'$ that defines the new graph $G'=(V,E')$.
+
+\item kernel computation: the diffusion-based graph node kernel $K$ is applied
+to graph $G^{'}$ to compute the kernel matrix $K'$ which captures the similarities
+between any couple of nodes, possibly belonging to different components in $G$. 
 \end{itemize}
+
+The kernel matrix $K'$ can be used directly by a kernelized learning
+algorithm, such as a support vector machine, to make predictive inferences.

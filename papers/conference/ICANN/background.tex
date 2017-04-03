@@ -2,18 +2,48 @@
 
 \section{Notation and Background}
 \label{background}
-Let us consider an undirected graph $G = (V, E)$ in which $V$ represents  a set of entities (vertices)  and $E$ characterizes the entity relationships (links). The adjacency matrix $A$ is a symmetric matrix used to describe the direct links between vertices $v_{i}$ and $v_{j}$ in the graph. Any entry $A_{ij}$ is equal to 1 when there exists a link connecting $v_{i}$ and $v_{j}$, and is 0 otherwise. The Laplacian matrix $L$ is defined as $L = D-A$, where $D$ is the diagonal matrix with non-null entries equal to the summation over the corresponding row of the adjacency matrix, i.e. $D_{ii}=\sum_j A_{ij}$. %The rest of the paper are described under this notation convention. 
-\subsubsection{Graph Node Kernels.}
-%As the desire of having a good node similarity measure for building graph-based leanring systems, many graph node kernels have been introduced and applied. 
-A graph node kernel is a kernel which defines the similarity between nodes in a graph. Formally, a graph node kernel, $k(\cdot,\cdot)$, is defined as $k: V \times V \longrightarrow \mathbb{R}$ such that $k$ is symmetric positive semidefinite. Graph node kernels have been applied in various fields such as recommender systems, disease gene prioritization, and so on. Most graph node kernels belong to one of  two popular frameworks: diffusion-based graph node kernels and decomposition graph node kernels. 
 
-Diffusion-based kernels can be considered as modifications of the laplacian diffusion kernel \cite{proceeding2}. These kernels measure the node proximity between any couple of nodes by taking into account the paths connecting them. They normally show state-of-the-art performance when dealing with dense graphs because of their ability to capture a global similarity measure. However, they perform poorly  when facing  sparse graphs with a low number of links and a high number of disconnected components. In the following, we briefly describe some of the most popular diffusion-based graph node kernels.
+Let us consider an undirected graph $G = (V, E)$ in which $V$ represents  a
+set of entities (vertices)  and $E$ characterizes the entity relationships
+(links). The adjacency matrix $A$ is a symmetric matrix used to describe the
+direct links between vertices $v_{i}$ and $v_{j}$ in the graph. Any entry
+$A_{ij}$ is equal to 1 when there exists a link connecting $v_{i}$ and
+$v_{j}$, and is 0 otherwise. The Laplacian matrix $L$ is defined as $L = D-A$,
+where $D$ is the diagonal matrix with non-null entries equal to the summation
+over the corresponding row of the adjacency matrix, i.e. $D_{ii}=\sum_j
+A_{ij}$.
+
+\subsubsection{Graph Node Kernels.}
+
+A graph node kernel is a kernel which defines the similarity between nodes in
+a graph. Formally, a graph node kernel, $k(\cdot,\cdot)$, is defined as $k: V
+\times V \longrightarrow \mathbb{R}$ such that $k$ is symmetric positive
+semidefinite. Graph node kernels have been successfully applied in various
+domains ranging from recommendation systems to disease gene prioritization.
+The most popular graph node kernels can be classified in: 1) diffusion-based
+or 2) decomposition graph node kernels.
+
+Diffusion-based graph node kernels derive from the laplacian diffusion kernel
+\cite{proceeding2}. These kernels measure the node proximity between pairs of
+nodes on the basis of the paths that connect them. They achieve state-of-the-
+art performance on dense graphs because of their ability to define a good
+notion of global similarity. However, their performance degrades for sparse
+graphs, especially in the presence of disconnected components.
+Among the most popular diffusion-based graph node kernels, there are:
+
 \begin{itemize}
 \item \textit{Laplacian exponential diffusion kernel (LEDK) \cite{proceeding2}:} This kernel is based on heat diffusion phenomenon: imagine to initialize each vertex with a given amount of heat and let it flow through the edges until an arbitrary instant of time. The similarity between any vertex couple $v_{i}$, $v_{j}$ is the amount of heat starting from $v_{i}$ and reaching $v_{j}$ within a given time. The LEDK kernel matrix is computed by:
 \begin{equation}
 K_{LEDK} = e^{-\beta L}\; ,
 \end{equation}
-where $\beta$ is the diffusion parameter used to control the rate of diffusion, and $e^{X}=\sum_{k=0}^{\infty} \frac{1}{k!}X^k$ refers to the matrix exponential for matrix $X$. Choosing a consistent value for $\beta$ is very important: on the one side, if $\beta$ is too small, the local information cannot be diffused effectively and, on the other side, if it is too large, the local information will be lost. $K_{LEDK}$ is positive semi-definite as proved in \cite{proceeding2}.
+
+where $\beta$ is the diffusion parameter used to control the rate of
+diffusion, and $e^{X}=\sum_{k=0}^{\infty} \frac{1}{k!}X^k$ refers to the
+matrix exponential for matrix $X$. Choosing a consistent value for $\beta$ is
+very important: on the one side, if $\beta$ is too small, the local
+information cannot be diffused effectively and, on the other side, if it is
+too large, the local information will be lost. $K_{LEDK}$ is positive semi-
+definite as proved in \cite{proceeding2}.
 
 \item \textit{Markov exponential diffusion kernel (MEDK) \cite{proceeding3}:} In LEDK, similarity values between high degree vertices is generally higher compared to that between low degree ones. This could be problematic since peripheral nodes have unbalanced similarities with respect to central nodes. To make the strength of individual vertices comparable, a modified version of LEDK is introduced:
 \begin{equation}
@@ -32,9 +62,53 @@ K_{RLK} = \sum_{n=0}^{\infty}\beta^{n}(-L)^n\; ,
 \end{equation}
 where $\beta$ is again the diffusion parameter. RLK counts the paths connecting two nodes on the graph induced by taking \textit{-L} as the adjacency matrix, regardless of the path length. Thus, a non-zero value is assigned to any couple of nodes as long as they are connected by any indirect path.
 \end{itemize}
-Decomposition graph node kernels take the idea from \cite{proceeding5} in which the similarity function between two graphs can be formed by decomposing each graph into subgraphs and by devising a valid local kernel between the subgraphs. This idea is then adjusted to measure graph node similarity by considering the neighborhood subgraph rooted at a vertex as its graph to compute. To form this kind of kernel, the graph matching problem, or equivalently the graph isomorphic problem, needs to be solved, which is not known to be solvable in polynomial time nor to belong to the NP-complete complexity class. An advantage of using decomposition kernels is the possibility to have non-zero similarity values for node couples located in distinct disconnected components of a graph. A recent and effective decomposition graph node kernel is the Conjunctive and Disjunctive Node Kernel (CDNK), proposed in \cite{proceeding6}. Considering a couple of nodes $u$ and $v$, the CDNK kernel defines the similarity between them by taking into account the common pairwise neighborhood subgraphs rooted at $u$ and $v$.
+
+In decomposition graph node kernels \cite{proceeding5} the similarity notion
+between two graphs is obtained by decomposing each graph into all the possible
+subgraphs belonging to a predetermined class and by devising a valid kernel
+between the resulting simpler subgraphs. It is possible to convert a
+decomposition graph kernel into a node kernel simply by extracting a subgraph
+to associate to each node, such as the neighborhood subgraph rooted at the
+node under consideration. An advantage of decomposition kernels is that they
+can autonomously address the case of nodes belonging to distinct graph
+components. A recent decomposition graph node kernel is the Conjunctive 
+Disjunctive Node Kernel (CDNK), proposed in \cite{proceeding6}, based on the
+extension of a neighborhood graph kernel to the dense graph case.
+
+
+
 \subsubsection{Link Prediction.}
 \label{link-prediction}
-Link prediction is a task that intends to recover the missing links or predict links that are present on graph in the future states of graph evolution. In other words, link prediction allows to make the ranking over all non-observed links. This ranking is based on scores which associate with non-observed links showing their likelihood to be considered as links of the graph. Many link prediction methods have been proposed in the literature and they are applied in different domains: recommendation systems, bioinformatics, network security, etc. These methods can be classified into different categories as discussed in \cite{jour2}: \textit{similarity-based algorithms}, \textit{maximum likelihood methods}, and \textit{probabilistic models}. Similarity-based methods assign for each non-observed link a score and this score is then directly used as the proximity between starting and ending nodes of that link. In maximum likelihood methods, some organizing principles of the network structure are assumed. Then, the likelihood of any non-observed link can be calculated according to corresponding rules and parameters. Probabilistic models aim at abstracting the underlying structure from the observed network, and predicting the missing links by using a learned model. Given a target graph G, the probabilistic model will optimize a built target function to establish a model composed of a group of parameters which can best fit the observed data of the target network.
 
-The similarity-based methods are the most popular in use since they are much simpler to deal with (and computationally less demanding) than maximum likelihood methods and probabilistic models. To define the similarity, we can use vertices' attributes. However, these attributes are normally hidden. Therefore, most similarity-based approaches are based on the structured similarity. Among similarity-based methods, global similarity-based methods normally outperform local and semi-local similarity-based algorithms since global methods are able to capture the glocal similarity between nodes of graph. It is important to notice that all graph node kernels belong to similarity group, and all graph node kernels described in previous section: LEDK, MEDK, MDK, RLK, CDNK, are global ones. Therefore, in this paper, we employ graph node kernels also for link prediction task.
+Link prediction is the task of recovering missing links or predicting links
+that are going to be present in the future state of an evolving graph. A link
+prediction algorithm  allows to score all non-observed links and rank them
+from the most  to the least probable.  Several link prediction algorithms have been
+proposed in literature and have been applied to different domains ranging from
+recommendation systems, to bioinformatics, to network security. 
+Following \cite{jour2}, we can classify these methods in:
+\textit{similarity-based algorithms}, \textit{maximum likelihood methods}, and
+\textit{probabilistic models}. Similarity-based methods assign for each non-
+observed link a score and this score is then directly used as the proximity
+between starting and ending nodes of that link. In maximum likelihood methods,
+some organizing principles of the network structure are assumed. Then, the
+likelihood of any non-observed link can be calculated according to
+corresponding rules and parameters. Probabilistic models aim at abstracting
+the underlying structure from the observed network, and predicting the missing
+links by using a learned model. Given a target graph $G$, the probabilistic
+model will optimize a built target function to establish a model composed of a
+group of parameters which can best fit the observed data of the target
+network.
+
+The similarity-based methods are popular since they are simpler and
+computationally more efficient than maximum likelihood and probabilistic
+models. To define a notion of similarity, we can use vertices' attributes.
+However, these attributes are normally hidden. Therefore, most similarity-
+based approaches are based on the structured similarity. Among similarity-
+based methods, global similarity-based methods normally outperform local and
+semi-local similarity-based algorithms since global methods are able to
+capture the glocal similarity between nodes of graph. It is important to
+notice that all graph node kernels belong to similarity group, and all graph
+node kernels described in previous section: LEDK, MEDK, MDK, RLK, CDNK, are
+global ones. Therefore, in this paper, we employ graph node kernels also for
+link prediction task.

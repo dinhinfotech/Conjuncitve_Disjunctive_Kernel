@@ -46,26 +46,27 @@ different sources of information used to build the underlying network (BioGPS,
 Biogridphys, Hprd, Omim). Note that each resource yields a graph with
 different characteristic sparsity and number of components. We compare the
 average AUC-ROC scores in two cases: plain diffusion kernel (denoted by a "-"
-symbol) and diffusion kernel on a modified network (denoted by a "+" symbol)
-which includes a set of novel edges identified by a link prediction system.
+symbol) and diffusion kernel on a modified network $G'$ (denoted by a "+"
+symbol) which includes the novel edges identified by a link prediction system.
 Here we report the aggregated results (a detailed breakdown is available in
-the \textit{Appendix}\footnote{https://github.com/dinhinfotech/ICANN/blob/master/appendix.pdf}) where we
-have averaged not only across a random choice of negative genes, but also
-among the type of diffusion kernel and the type of link prediction. The
-noteworthy result is how consistent the result is: each link prediction method
-improves each diffusion kernel algorithm, and on average using link prediction
-yields a 15\% to 20\% relative error reduction for diffusion-based methods.
-What varies is the amount of improvement, which depends on the coupling
-between the four elements: the disease, the information source, the link
-prediction method and the diffusion kernel algorithm. In specific we obtain
-that the largest improvement is obtained for disease 3 (connective) where we
-have a maximum improvement of 20\% ROC points, while the minimum improvement
-is for disease 8 (immunological) with a minimal improvement of 0\% ROC points.
-On average the largest improvement is of 13\% ROC points, while the smallest
-improvement is on average of 1\% ROC point. These results are of interest
-since these diffusion kernel approaches are currently state-of-the-art
-approaches for gene-disease prioritization, and hence a technique that
-can offer a consistent improvement has important practical consequences.
+the \textit{Appendix}\footnote{https://github.com/dinhinfotech/ICANN/blob/mast
+er/appendix.pdf}) where we have averaged not only across a random choice of
+negative genes, but also among the type of diffusion kernel and the type of
+link prediction. The noteworthy result is how consistent the result is: each
+link prediction method improves each diffusion kernel algorithm, and on
+average using link prediction yields a 15\% to 20\% relative error reduction
+for diffusion-based methods. What varies is the amount of improvement, which
+depends on the coupling between the four elements: the disease, the
+information source, the link prediction method and the diffusion kernel
+algorithm. In specific we obtain that the largest improvement is obtained for
+disease 3 (connective) where we have a maximum improvement of 20\% ROC points,
+while the minimum improvement is for disease 8 (immunological) with a minimal
+improvement of 0\% ROC points. On average the largest improvement is of 13\%
+ROC points, while the smallest improvement is on average of 1\% ROC point.
+Such stable results are of interest since diffusion-based methods are
+currently state-of-the-art for gene-disease prioritization tasks, and hence a
+technique that can offer a consistent and relatively large improvement can have
+important practical consequences in the understanding of disease mechanisms.
 
 \section{Conclusion and Future Work}
 \label{conclusion}
@@ -77,7 +78,8 @@ diffusion kernels, that is, the idea of carrying out the computation of
 information diffusion on a network that contains edges identified by link
 prediction approaches. We have discovered a surprisingly robust signal that
 indicates that diffusion-based node kernels consistently benefit from the
-coupling with link prediction techniques of the similarity-based type.
+coupling with similarity-based link prediction techniques on large
+scale datasets in biological domains.
 
 In future work we will carry out a more fine grained analysis, defining a
 taxonomy of prediction problems on networks that make use of the notion of
