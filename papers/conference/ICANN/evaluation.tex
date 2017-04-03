@@ -6,62 +6,60 @@ To empirically study the answer to the question: {\em how can we improve node
 similarity using link prediction?} we would need to define a taxonomy of
 prediction problems on networks that make use of the notion of node similarity
 and analyze which link prediction strategies can be effectively coupled with
-specific node similarity computation techniques given a class of problem. In
-this paper we start such endeavor restricting the type of predictive problems
-to that of node ranking in the sub-domain of gene-disease association studies.
-More in detail, the task, known as {\em gene prioritization}, consists in
-ranking candidate genes based on their probabilities to be related to a
-disease on the basis of a given a set of genes known to be associated to the
-disease of interest. 
-We have assessed our approach on the four following datasets.
+specific node similarity computation techniques for each given class of
+problems. In addition we should also study the quantitative relation between
+the degree of missingness and the size of the improvement offered by
+prepending the link prediction to the node similarity assessment. In this
+paper we start such endeavor restricting the type of predictive problems to
+that of node ranking in the sub-domain of gene-disease association studies
+with a fixed but unknown degree of missingness given by the current medical
+knowledge. More in detail, the task, known as {\em gene prioritization},
+consists in ranking candidate genes based on their probabilities to be related
+to a disease on the basis of a given a set of genes experimentally known to be
+associated to the disease of interest. We have studied the proposed approach on the
+following 4 datasets:
 
-\textbf{BioGPS:} a gene co-expression network (7311 nodes and 911294 edges) is
+\textbf{BioGPS:} a gene co-expression network (7311 nodes and 911294 edges) 
 constructed from the BioGPS dataset, which contains 79 tissues, measured with
 the Affymetrix U133A array. Edges are inserted when the pairwise Pearson
 correlation coefficient (PCC) between genes is larger than 0.5.
 
 \textbf{HPRD:} a database of curated proteomic information pertaining to
 human proteins. It is derived from \cite{jour5} with 9,465 vertices and 37,039
-edges. We employ the HPRD version used in \cite{jour6} in which they remove
-some vertices so to have 7311 nodes and 30503 edges remaining. HPRD, and
-BioGPS, are used in \cite{proceeding3}.
+edges. We employ the HPRD version used in \cite{jour6} that contains 7311 nodes and 30503 edges. %HPRD, and BioGPS, are used in \cite{proceeding3}.
 
-\textbf{Phenotype similarity:} in order to capture the relatedness of genes
-from a phenotypic point of view, we resort to OMIM \cite{jour4} data and the
-phenotype similarity conceived by Van Driel et al. \cite{jour5}. They define a
-similarity among OMIM phenotypes based on the relevance and the frequency of
-the Medical Subject Headings (MeSH) vocabulary terms in the corresponding OMIM
-text documents. We converted this information into a graph by linking those
+\textbf{Phenotype similarity:} we use the OMIM \cite{jour4} dataset and the
+phenotype similarity notion introduced by Van Driel et al. \cite{jour5} based on the relevance and the frequency of
+the Medical Subject Headings (MeSH) vocabulary terms in OMIM documents. We built the graph linking those
 genes whose associated phenotypes have a maximal phenotypic similarity greater
-than a fixed cut-off value. The weight of the link is the maximal similarity
-among the phenotypes relative to the two considered genes. We set the
-similarity cut-off by following \cite{jour5} with a similarity score greater
-than $0.3$. Finally, we obtain a network with 3393 nodes and 144739 edges.
+than a fixed cut-off value. Following \cite{jour5}, we set the
+similarity cut-off to $0.3$. The resulting network has 3393 nodes and 144739 edges.
 
-\textbf{Biogridphys:} This dataset represents the physical interactions
+\textbf{Biogridphys:} this dataset encodes known physical interactions
 among proteins. The idea is that mutations can affect physical interactions by
-changing proteins shape and their effect can propagate through protein
-networks. We introduce a link between two genes if their products interact. As
-a result, the achieved network consists of 15389 nodes and 155333 edges.
+changing the shape of proteins and their effect can propagate through protein
+networks. We introduce a link between two genes if their products interact. The resulting network has 15389 nodes and 155333 edges.
 
 \subsection{Evaluation Method}
 
 To evaluate the performance of the diffusion kernels, we proceed in the same
 way as \cite{proceeding3}: we choose $14$ diseases with have at least $30$
-confirmed genes. For each disease, we construct a positive set
-$\mathcal{P}$ with all confirmed disease genes. To build the negative set
-$\mathcal{N}$ instead, we randomly sample a set of genes that are associated at least
-to one disease class, but not related to the class which defines the positive
-set such that $\vert \mathcal{N} \vert = \frac{1}{2} \vert \mathcal{P} \vert$.
-We replicate this procedure 5 times\footnote{Note that the positive set is held constant, while the negative set varies.} . We assess the performance of kernels through a
-paradigm similar to 3-fold CV: each ($\mathcal{P}$ + $\mathcal{U}$) set is
-partitioned into three folds, where one fold is used to train the model (via a
-linear SVM) and the two folds are used to test. For each test gene $g_i$,
-model returns a score $s_i$ showing its likelihood to be associated to the
-disease. Next a decision score $q_i$ is computed as the top percentage value
-of $s_i$ among all candidate gene scores. We collect all decision scores for
-every test genes to compute AUC-ROC. The final performance on the disease
-class is obtained by taking average over $3\times$5 trials.
+confirmed genes. For each disease, we construct a positive set $\mathcal{P}$
+with all confirmed disease genes. To build the negative set $\mathcal{N}$, we
+randomly sample a set of genes that are associated at least to one disease
+class, but not related to the class which defines the positive set such that
+$\vert \mathcal{N} \vert = \frac{1}{2} \vert \mathcal{P} \vert$. We replicate
+this procedure 5 times\footnote{Note that the positive set is held constant,
+while the negative set varies.}. We assess the performance of kernels via a
+3-fold CV, where, after partitioning  the dataset $\mathcal{P}$ +
+$\mathcal{U}$ in 3 folds, we use one fold for training and the two remaining
+folds for testing.  For each test gene $g_i$, the model returns a score $s_i$
+proportional to the likelihood of being associated to the disease. Next a decision score
+$q_i$ is computed as the top percentage value of $s_i$ among all candidate
+gene scores. We collect all decision scores for every test genes to compute
+AUC-ROC. The final performance on the disease class is obtained by taking
+average over $3\times$5 trials.
+
 
 \textbf{Model Selection}: The hyper parameters of the various methods are
 set using a 3-fold on a dataset set that is then never used in the predictive
@@ -70,7 +68,6 @@ performance estimation. We try the values for LEDK and MEDK in $\lbrace  0.01,
 parameter in $\lbrace 0.01, 0.1, 1 \rbrace$. For CDNK, we try for the degree
 threshold value in $\lbrace 10,\ 15,\ 20 \rbrace$, clique size threshold in
 $\lbrace 4,\ 5 \rbrace$, maximum radius in $\lbrace 1,\ 2 \rbrace$, maximum
-distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Number of added links are set in
-$\lbrace 40\%,\ 50\%,\ 60\%,\ 70\% \rbrace$ over total number of existing
-links. Finally, the $C$ of SVM is searched in $\lbrace 10^{-4},  \ 10^{-3}, \
-10^{-2},\ 10^{-1}, 1,\ 10,\ 10^2, \ 10^3,\ 10^4 \rbrace$.
+distance in $\lbrace 2,\ 3,\ 4 \rbrace$. 
+The number of links used for the enrichment are chosen in $\lbrace 40\%,\ 50\%,\ 60\%,\ 70\% \rbrace$of the number of existing links. 
+Finally, the regularization tradeoff $C$ for the linear SVM is chosen in $\lbrace 10^{-4}, 10^{-3}, 0^{-2},\ 10^{-1}, 1,\ 10,\ 10^2, \ 10^3,\ 10^4 \rbrace$.

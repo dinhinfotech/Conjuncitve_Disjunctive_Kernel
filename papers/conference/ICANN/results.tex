@@ -1,7 +1,6 @@
 % !TeX root = link_prediction_for_diffusion_kernels.tex
 
-\section{Results and Discussion}
-\label{results-discussion}
+
 \definecolor{cadetgrey}{rgb}{0.8721875,0.8721875,0.8721875}
 \newcolumntype{g}{>{\columncolor{cadetgrey}}c}
 
@@ -9,14 +8,14 @@
 \begin{table*}[!htbp]
 \vspace*{-0.5cm}
 \centering
-\caption{\textit {Predictive performance on 14 gene-disease associations using four different networks induced by the BioGPS, Biogridphys, Hprd and Omim. We report the average AUC-ROC (\%) and standard deviations for all difussion-based kernels with (B) and without (A) using link enrichment.}}
+\caption{\textit {Predictive performance on 14 gene-disease associations using four different networks induced by the BioGPS, Biogridphys, Hprd and Omim. We report the average AUC-ROC (\%) and standard deviations for all difussion-based kernels with (+) and without (-) link enrichment.}}
 \label{table:results1}
 \setlength{\tabcolsep}{0.6mm}
 \begin{tabular}{|c|c|g|c|g|c|g|c|g|}
 \hline
  & \multicolumn{2}{c|}{\textbf{BioGPS}} & \multicolumn{2}{c|}{\textbf{Biogridphys}} & \multicolumn{2}{c|}{\textbf{Hprd}} & \multicolumn{2}{c|}{\textbf{Omim}}\\
  \hline
-Disease & A & B & A & B & A & B & A & B \\
+Disease & - & + & - & + & - & + & - & + \\
 \hline
 1 & 60.3$\pm$1.5 & 63.4$\pm$1.0 & 73.1$\pm$4.1 & 77.1$\pm$2.9 & 75.5$\pm$0.2 & 77.5$\pm$0.9 & 85.3$\pm$1.1 & 86.9$\pm$1.5 \\
 2 & 53.7$\pm$1.4 & 63.4$\pm$3.8 & 56.6$\pm$3.4 & 61.3$\pm$4.1 & 57.1$\pm$0.9 & 60.2$\pm$1.8 & 75.0$\pm$2.2 & 76.5$\pm$2.4 \\
@@ -37,11 +36,31 @@ $\overline{AUC}$ & 60.2$\pm$0.3 & 66.7$\pm$1.2 & 60.8$\pm$1.6 & 67.0$\pm$4.0 & 6
 \hline
 \end{tabular}
 \end{table*}
-\newcommand{\squeezeup}{\vspace{-4mm}}
-\squeezeup
-Table \ref{table:results1} shows the average predictive performances of diease gene prioritization system on 14 genetic diseases and four genetic networks. In each experiment, we test performance of system with the use kernels with and without using link enrichment. Overall, the performance of system with link enrichment are remarkably higher than not using link enrichment in every disease and dataset. In particular, the use of link enrichment helps to improve in average around 6$\%$ on BioGPS, Biogridphys and Hprd, and 3$\%$ in Omim. The detail of all experimental results can be found in the \textit{appendix} \footnote{https://github.com/}. Considering a specific kernel, the performance of the system get higher with the use of any link enrichment methods comparing to it without using link enrichment. 
-It illustrates that the method is stable for the use of link enrichment methods and is considerable when constructing graph-based learning systems using diffusion-based kernels.
+
+\section{Results and Discussion}
+\label{results-discussion}
+
+Table \ref{table:results1} shows the average predictive performances of disease
+gene prioritization system on 14 genetic diseases and four genetic networks.
+In each experiment, we test performance of system with the use kernels with
+and without using link enrichment. Overall, the performance of system with
+link enrichment are remarkably higher than not using link enrichment in every
+disease and dataset. In particular, the use of link enrichment helps to
+improve in average around 6$\%$ on BioGPS, Biogridphys and Hprd, and 3$\%$ in
+Omim. The detail of all experimental results can be found in the
+\textit{appendix} \footnote{https://github.com/}. Considering a specific
+kernel, the performance of the system get higher with the use of any link
+enrichment methods comparing to it without using link enrichment.  It
+illustrates that the method is stable for the use of link enrichment methods
+and is considerable when constructing graph-based learning systems using
+diffusion-based kernels.
 
 \section{Conclusion}
 \label{conclusion}
-In this paper, we have proposed a novel method to boost the power of diffusion-based graph node kernel by using link enrichment paradigm. The results achieved from empirical experiments illustrate that our proposed method is noticeable when using diffusion-based graph node kernels to build learning systems. For the coming work, we desire to apply this boosting method to improve the performance of systems using kernel integration.
+
+In this paper, we have proposed a novel method to boost the power of
+diffusion-based graph node kernel by using link enrichment paradigm. The
+results achieved from empirical experiments illustrate that our proposed
+method is noticeable when using diffusion-based graph node kernels to build
+learning systems. For the coming work, we desire to apply this boosting method
+to improve the performance of systems using kernel integration.
