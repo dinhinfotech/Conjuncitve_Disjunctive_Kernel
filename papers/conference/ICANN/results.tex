@@ -40,27 +40,49 @@ $\overline{AUC}$ & 60.2$\pm$0.3 & 66.7$\pm$1.2 & 60.8$\pm$1.6 & 67.0$\pm$4.0 & 6
 \section{Results and Discussion}
 \label{results-discussion}
 
-Table \ref{table:results1} shows the average predictive performances of disease
-gene prioritization system on 14 genetic diseases and four genetic networks.
-In each experiment, we test performance of system with the use kernels with
-and without using link enrichment. Overall, the performance of system with
-link enrichment are remarkably higher than not using link enrichment in every
-disease and dataset. In particular, the use of link enrichment helps to
-improve in average around 6$\%$ on BioGPS, Biogridphys and Hprd, and 3$\%$ in
-Omim. The detail of all experimental results can be found in the
-\textit{appendix} \footnote{https://github.com/}. Considering a specific
-kernel, the performance of the system get higher with the use of any link
-enrichment methods comparing to it without using link enrichment.  It
-illustrates that the method is stable for the use of link enrichment methods
-and is considerable when constructing graph-based learning systems using
-diffusion-based kernels.
+In Table \ref{table:results1} we report a synthesis of all the experiments.
+Each row represent a different disease, in the columns we consider the
+different sources of information used to build the underlying network (BioGPS,
+Biogridphys, Hprd, Omim). Note that each resource yields a graph with
+different characteristic sparsity and number of components. We compare the
+average AUC-ROC scores in two cases: plain diffusion kernel (denoted by a "-"
+symbol) and diffusion kernel on a modified network (denoted by a "+" symbol)
+which includes a set of novel edges identified by a link prediction system.
+Here we report the aggregated results (a detailed breakdown is available in
+the \textit{Appendix}\footnote{https://github.comXXXXXXXXXXXXXXXX/}) where we
+have averaged not only across a random choice of negative genes, but also
+among the type of diffusion kernel and the type of link prediction. The
+noteworthy result is how consistent the result is: each link prediction method
+improves each diffusion kernel algorithm, and on average using link prediction
+yields a 15\% to 20\% relative error reduction for diffusion-based methods.
+What varies is the amount of improvement, which depends on the coupling
+between the four elements: the disease, the information source, the link
+prediction method and the diffusion kernel algorithm. In specific we obtain
+that the biggest improvement is obtained for disease 3 () we have a maximum
+improvement of 20\% ROC points, while for disease 8 () the minimal improvement is
+of 0\% ROC points. These results are of interest since these diffusion kernel
+approaches are currently state-of-the-art approaches for gene-disease
+prioritization.
 
-\section{Conclusion}
+\section{Conclusion and Future Work}
 \label{conclusion}
 
-In this paper, we have proposed a novel method to boost the power of
-diffusion-based graph node kernel by using link enrichment paradigm. The
-results achieved from empirical experiments illustrate that our proposed
-method is noticeable when using diffusion-based graph node kernels to build
-learning systems. For the coming work, we desire to apply this boosting method
-to improve the performance of systems using kernel integration.
+% what is the contribution that is not trivial
+
+In this paper, we have proposed the notion of {\em link enrichment} for
+diffusion kernels, that is, the idea of carrying out the computation of
+information diffusion on a network that contains edges identified by link
+prediction approaches. We have discovered a robust signal that indicates that
+a certain class of diffusion-based node kernels consistently benefits from the
+coupling with link prediction techniques of the X type for a 
+
+In future work we will carry out a more fine grained analysis, defining a
+taxonomy of prediction problems on networks that make use of the notion of
+node similarity and analyze which link prediction strategies can be
+effectively coupled with specific node similarity computation techniques for
+each given class of problems. In addition we will study the quantitative
+relation between the degree of missingness and the size of the improvement
+offered by prepending the link prediction to the node similarity assessment.
+Finally we will extend the analysis to the more complex case of kernel
+integration and data fusion, i.e. when multiple heterogeneous information
+sources are used jointly to define the predictive task.
