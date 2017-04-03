@@ -1,0 +1,9 @@
+\section{Method}
+\label{method}
+Information encoded in data is usually incomplete. This usually leads to the sparsity issue when using graphs to represent  data. As a consequence,  graph-based systems which use diffusion-based kernels show limited performances. Therefore, in this section, we describe our proposed method, based on link enrichment, to strengthen diffusion-based graph node kernels, so that the performance of graph-based systems can be improved.
+
+Given a sparse graph $G=(V, E)$ in which $|V| = n$ and $|E| = m$, the proposed method consists of two phases:
+\begin{itemize}
+\item Link enrichment: in the first phase, starting from the graph $G$, we utilize a link prediction method to compute scores for all $\frac{n(n-1)}{2}-m$ candidate links. These scores represent  their probabilities to be considered as a link in the graph. The candidate links are then sorted based on their corresponding scores. The top $t$ links in the sorted link list are added into $G$ to obtain a new enriched graph $G^{'}$.
+\item Kernel computation: in the second phase, we apply the chosen diffusion-based graph node kernel to the achieved graph $G^{'}$ to compute the kernel matrix which encodes the similarities between any couple of nodes. This kernel matrix can then  be used into graph kernel-based learning systems to make inference.
+\end{itemize}

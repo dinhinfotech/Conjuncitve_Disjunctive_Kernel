@@ -1,0 +1,45 @@
+\section{Results and Discussion}
+\label{results-discussion}
+\definecolor{cadetgrey}{rgb}{0.8721875,0.8721875,0.8721875}
+\newcolumntype{g}{>{\columncolor{cadetgrey}}c}
+
+{\setlength{\extrarowheight}{2pt}
+\begin{table*}[!htbp]
+\vspace*{-0.5cm}
+\centering
+\caption{\textit {Predictive performance on 14 gene-disease associations using four different networks induced by the BioGPS, Biogridphys, Hprd and Omim. We report the average AUC-ROC (\%) and standard deviations for all difussion-based kernels with (B) and without (A) using link enrichment.}}
+\label{table:results1}
+\setlength{\tabcolsep}{0.6mm}
+\begin{tabular}{|c|c|g|c|g|c|g|c|g|}
+\hline
+ & \multicolumn{2}{c|}{\textbf{BioGPS}} & \multicolumn{2}{c|}{\textbf{Biogridphys}} & \multicolumn{2}{c|}{\textbf{Hprd}} & \multicolumn{2}{c|}{\textbf{Omim}}\\
+ \hline
+Disease & A & B & A & B & A & B & A & B \\
+\hline
+1 & 60.3$\pm$1.5 & 63.4$\pm$1.0 & 73.1$\pm$4.1 & 77.1$\pm$2.9 & 75.5$\pm$0.2 & 77.5$\pm$0.9 & 85.3$\pm$1.1 & 86.9$\pm$1.5 \\
+2 & 53.7$\pm$1.4 & 63.4$\pm$3.8 & 56.6$\pm$3.4 & 61.3$\pm$4.1 & 57.1$\pm$0.9 & 60.2$\pm$1.8 & 75.0$\pm$2.2 & 76.5$\pm$2.4 \\
+3 & 50.2$\pm$0.4 & 58.6$\pm$3.0 & 58.9$\pm$5.9 & 67.5$\pm$7.7 & 61.8$\pm$3.6 & 70.7$\pm$3.8 & 77.3$\pm$1.8 & 83.1$\pm$0.9 \\
+4 & 61.5$\pm$0.9 & 72.2$\pm$2.2 & 65.7$\pm$4.1 & 74.6$\pm$4.2 & 67.3$\pm$1.1 & 71.9$\pm$2.2 & 90.2$\pm$1.2 & 92.1$\pm$1.2 \\
+5 & 55.1$\pm$0.4 & 61.7$\pm$0.9 & 54.2$\pm$4.8 & 60.7$\pm$4.0 & 57.7$\pm$1.6 & 67.0$\pm$1.8 & 76.4$\pm$0.8 & 81.9$\pm$1.5 \\
+6 & 60.8$\pm$0.9 & 67.9$\pm$2.2 & 60.6$\pm$3.6 & 65.9$\pm$3.5 & 66.8$\pm$1.3 & 71.9$\pm$2.3 & 79.9$\pm$2.4 & 83.3$\pm$1.2 \\
+7 & 68.1$\pm$1.4 & 73.4$\pm$0.7 & 57.7$\pm$3.2 & 63.7$\pm$4.0 & 68.9$\pm$2.1 & 72.5$\pm$1.2 & 81.0$\pm$1.2 & 84.1$\pm$1.0 \\
+8 & 69.2$\pm$2.3 & 74.0$\pm$2.2 & 68.1$\pm$3.6 & 72.6$\pm$2.5 & 76.6$\pm$2.2 & 80.3$\pm$2.8 & 85.4$\pm$2.2 & 91.0$\pm$1.0 \\
+9 & 62.0$\pm$1.6 & 64.5$\pm$1.4 & 68.7$\pm$4.6 & 71.7$\pm$4.3 & 68.4$\pm$2.5 & 75.0$\pm$3.2 & 78.5$\pm$0.2 & 80.6$\pm$0.6 \\
+10 & 67.5$\pm$2.9 & 72.9$\pm$1.8 & 58.8$\pm$3.2 & 66.1$\pm$3.8 & 65.8$\pm$3.4 & 74.4$\pm$2.6 & 86.1$\pm$0.6 & 87.8$\pm$0.3 \\
+11 & 58.7$\pm$1.8 & 62.3$\pm$1.5 & 58.2$\pm$1.2 & 61.6$\pm$1.7 & 60.1$\pm$1.1 & 64.2$\pm$1.5 & 82.0$\pm$1.4 & 83.6$\pm$0.9 \\
+12 & 64.0$\pm$1.3 & 73.6$\pm$1.7 & 59.3$\pm$2.1 & 67.0$\pm$2.8 & 60.8$\pm$1.1 & 68.8$\pm$2.8 & 82.0$\pm$1.8 & 85.9$\pm$1.7 \\
+13 & 56.5$\pm$0.9 & 63.3$\pm$2.4 & 55.8$\pm$1.1 & 65.1$\pm$4.2 & 66.4$\pm$1.3 & 71.8$\pm$1.7 & 83.1$\pm$2.8 & 87.5$\pm$2.5 \\
+14 & 55.2$\pm$0.3 & 62.3$\pm$1.2 & 55.6$\pm$1.6 & 63.5$\pm$4.0 & 66.3$\pm$2.3 & 71.1$\pm$2.8 & 97.4$\pm$0.1 & 99.0$\pm$0.4 \\
+\hline
+$\overline{AUC}$ & 60.2$\pm$0.3 & 66.7$\pm$1.2 & 60.8$\pm$1.6 & 67.0$\pm$4.0 & 65.7$\pm$2.3 & 71.2$\pm$2.8 & 82.8$\pm$0.1 & 86.0$\pm$0.4 \\
+\hline
+\end{tabular}
+\end{table*}
+\newcommand{\squeezeup}{\vspace{-4mm}}
+\squeezeup
+Table \ref{table:results1} shows the average predictive performances of diease gene prioritization system on 14 genetic diseases and four genetic networks. In each experiment, we test performance of system with the use kernels with and without using link enrichment. Overall, the performance of system with link enrichment are remarkably higher than not using link enrichment in every disease and dataset. In particular, the use of link enrichment helps to improve in average around 6$\%$ on BioGPS, Biogridphys and Hprd, and 3$\%$ in Omim. The detail of all experimental results can be found in the \textit{appendix} \footnote{https://github.com/}. Considering a specific kernel, the performance of the system get higher with the use of any link enrichment methods comparing to it without using link enrichment. 
+It illustrates that the method is stable for the use of link enrichment methods and is considerable when constructing graph-based learning systems using diffusion-based kernels.
+
+\section{Conclusion}
+\label{conclusion}
+In this paper, we have proposed a novel method to boost the power of diffusion-based graph node kernel by using link enrichment paradigm. The results achieved from empirical experiments illustrate that our proposed method is noticeable when using diffusion-based graph node kernels to build learning systems. For the coming work, we desire to apply this boosting method to improve the performance of systems using kernel integration.
