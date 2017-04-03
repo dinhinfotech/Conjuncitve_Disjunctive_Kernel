@@ -27,20 +27,21 @@ common approach is to resort to graph node kernels such as diffusion-based
 kernels \cite{proceeding2} where the graph node kernel measures the proximity
 between any pair of nodes by taking into account the paths that connect them.
 However, when the graph structure is affected by noise in the form of missing
-links, similarities are distorted  proportionally to the sparsity of the graph
-and to the fraction of missing links. Two of the main reasons for this are
-that 1) the lower the average node degree is, the smaller the number of paths
-through which information travels, and 2) missing links can end up separating
-a network into multiple disconnected components. In this case, since
-information cannot travel across disconnected components, the similarity of
-nodes belonging to different components is zero. To address these problems we
-propose to solve  a link prediction problem prior to the node similarity
-computation and start studying the question: {\em how can we improve node
-similarity using link prediction?} In this work we review both the link
-prediction literature and the diffusion kernel literature, select a subset of
-approaches in both categories that seem well suited for the task, focus on a
-set of node predicting problems in the bioinformatics field and empirically
-investigate the effectiveness of their combination w.r.t. the given tasks. The
-encouraging result that we find is that all the strategies for link prediction we
-examined consistently enhance the performance on downstream predictive tasks,
-often significantly improving state of the art results.
+links, node similarities are distorted  proportionally to the sparsity of the
+graph and to the fraction of missing links. Two of the main reasons for this
+are that 1) the lower the average node degree is, the smaller the number of
+paths through which information can travel, and 2) missing links can end up
+separating a network into multiple disconnected components. In this case,
+since  information cannot travel across disconnected components, the
+similarity of nodes belonging to different components is null. To address
+these problems we propose to solve a link prediction task prior to the node
+similarity computation and start studying the question: {\em how can we
+improve node similarity using link prediction?} In this work we review both
+the link prediction literature and the diffusion kernel literature, select a
+subset of approaches in both categories that seem well suited, focus on a set
+of node predicting problems in the bioinformatics domain and empirically
+investigate the effectiveness of the combination of these approaches for given
+predictive tasks. The encouraging result that we find is that all the
+strategies for link prediction we examined consistently enhance the
+performance on downstream predictive tasks, often significantly improving
+state of the art results.
