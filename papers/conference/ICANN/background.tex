@@ -1,3 +1,5 @@
+% !TeX root = link_prediction_for_diffusion_kernels.tex
+
 \section{Notation and Background}
 \label{background}
 Let us consider an undirected graph $G = (V, E)$ in which $V$ represents  a set of entities (vertices)  and $E$ characterizes the entity relationships (links). The adjacency matrix $A$ is a symmetric matrix used to describe the direct links between vertices $v_{i}$ and $v_{j}$ in the graph. Any entry $A_{ij}$ is equal to 1 when there exists a link connecting $v_{i}$ and $v_{j}$, and is 0 otherwise. The Laplacian matrix $L$ is defined as $L = D-A$, where $D$ is the diagonal matrix with non-null entries equal to the summation over the corresponding row of the adjacency matrix, i.e. $D_{ii}=\sum_j A_{ij}$. %The rest of the paper are described under this notation convention. 
