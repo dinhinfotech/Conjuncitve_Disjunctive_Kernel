@@ -1,0 +1,284 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+% \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading nips_2017
+%
+% to avoid loading the natbib package, add option nonatbib:
+%\usepackage[nonatbib]{nips_2017}
+
+\usepackage{nips_2017}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+% \usepackage[final]{nips_2017}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{float}
+
+%\usepackage[latin1]{inputenc}
+\usepackage{amssymb,amsmath,array}
+
+\title{JNSL - Joint Neighborhood Subgraph Link Prediction Method}
+
+% The \author macro works with any number of authors. There are two
+% commands used to separate the names and addresses of multiple
+% authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to
+% break the lines. Using \AND forces a line break at that point. So,
+% if LaTeX puts 3 of 4 authors names on the first line, and the last
+% on the second line, try using \AND instead of \And before the third
+% author name.
+
+\author{
+  David S.~Hippocampus\thanks{Use footnote for providing further
+    information about author (webpage, alternative
+    address)---\emph{not} for acknowledging funding agencies.} \\
+  Department of Computer Science\\
+  Cranberry-Lemon University\\
+  Pittsburgh, PA 15213 \\
+  \texttt{hippo@cs.cranberry-lemon.edu} \\
+  %% examples of more authors
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+  %% \AND
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+}
+
+\begin{document}
+% \nipsfinalcopy is no longer used
+
+\maketitle
+
+\begin{abstract}
+Graphs are common data structure used to present biological data in which nodes describe entities and links characterize their relationships. In many cases, there are many links are missing due to the lack of knowledge, it causes the problem for further studies and for graph-based learning systems. As a consequence, a number of link prediction methods have been proposed to discover these missing links. However, most existing link prediction methods are based on the transitive manner which first cannot effectively exploit graph structures and second do not allow to recover links whose end points locating in different isolated components. Therefore, they only show limited performance. In this paper, we propose a joint neighborhood subgraph link prediction method that not only can fully exploit the graph structure by dealing with isomorphism of joint neighborhood subgraphs associated to links but also make predictions based on a learning process. Moreover, our method is able to recover links connecting isolated components. The performance on several data sets confirms that our method shows the state of the art performance for link prediction.
+\end{abstract}
+\section{Introduction} 
+In the last decade, thanks to the advent of high-thoughput technology, a huge amout of biological data have been made available. Such hugh data bring a golden opportunity for us to explore and extract important information. This allows to expand our understanding about the nature of biological processes which have been (partially) hidden. Biological processes are usually represented in the form of networks whose nodes represent a set of entities and links characterize entities' relatiionships. Human Protein Reference Database (HPRD) \cite{hprd} is an instance in which a node depicts a gene and a link is formed to connect two genes if their corresponding proteins interact. Despite the fact that a hugh data are accessible, most networks are still far from being complete. It is demonstrated with the sparity of networks whose limited number of present links and high number of missing links. This prevents computational systems and machine learning techniques with the aim of extracting and inferring knowledge from data, from showing high performance since they normally require a certain amount of data to train models. Link prediction is a solution for this situation. Link prediction aims at recovering the missing links by making a ranking over non-observed links based on their likelihood to be links. It can be directly used to uncover relationship between entities or used to enrich links of graphs by adding the top non-observed links into graphs. These obtained graphs then are used as the input of graph-based learning systems.
+
+Regarding link prediction in general, a number of methods have been proposed and applied in different domains ranging from Recommandation systems to Bioinformatics, to social networks. In \cite{link-prediction}, a quite exhausive survey of link predictions methods is presented. Most popular link prediction methods are in the similarity-based class in which each non-observed link is assigned a score and this score is directly used as the similarity between starting and ending nodes of the link. For example, Leicht-Holme-Newman \cite{lhn}, Local random walk \cite{lrw} and Local path index \cite{lpi1} are similarity-based algorithms where the similarity between nodes are computed by considering the local paths. However, these methods are based on the transitive manner which cannot effectively exploit graph structures and the prediction is made without using any learing process. Moreover, it is impossible to have non-zero similarities measured for non-observed links whose end points located in different disconected component of the graph. Therefore, they often show limited performance.
+
+In this paper, we propose a novel method for link prediction. In our method, we present each possible link by a joint neighborhood subgraph formed from the starting and ending node's neighborhood graphs. These graphs are used to build a model in which the graph similarity measurement is computed by employing NSPDK kernel \cite{nspdk} whose implementation of an approximation for graph isomorphism. Once the model is constructed, it is used to make prediction. Our method not only is able to effectively exploit the graph structure, but also able to distingush between positive and negative links by learning process. Interestingly, it allows to have un-null values for non-observed links connecting points between two isolated components. Empirical experiments in three different biological data sets illustrate the effectiveness of our proposed link prediction methods.
+
+This paper is organized as follows: first the background and notations are presented in Section \ref{notation-background}. In Section \ref{method}, the proposed method is presented. Next, the evaluation followed by results and discussion are shown in Section \ref{evaluation} and \ref{result-discussion}, respectively. Finally, we make conclusion and plan for coming work in Section \ref{conclusion-futurework}.
+
+%============================================
+\section{Notation and background}
+\label{notation-background}
+In this section we first present notations and definitions used in this paper. We then briefly describe link prediction problem and some popular link prediction methods.
+\subsection{Notation and Definitions}
+A graph $G = (V,E)$ is a structure in which $V$ is a node set and $E$ is a link set. The adjacency matrix, $A$, is a symmetric whose entry $a_{ij} = 1$ if there is a direct link connecting $v_i \in V$ and $v_j \in V$, $v_i$ and $v_j$ are vertices corresponding to indices $i$ and $j$, respectively, and $a_{ij} = 0$ otherwise. The Laplacian matrix $L$ is defined as $L = D-A$, where $D$ is the diagonal matrix with non-null entries equal to the summation over the corresponding row of the adjacency matrix, i.e. $D_{ii}=\sum_jA_{ij}$. The \textit{distance} between two nodes $u$ and $v$, notated as $\mathcal{D}(u,v)$, is the length of the shortest path between them. The \textit{neighborhood} with radius $r$ of a node $v$ is the set of nodes
+at a distance no greater than $r$ from $v$ and denoted by $N_r(v)$. The \textit{neighborhood subgraph} with radius $r$ of node $v$, denoted by $\mathcal{N}_{r}^{v}$,  is the subgraph formed by the nodes in the
+neighborhood with radius $r$ of $v$ and the relative edges with endpoints in $N_r(v)$.
+
+\subsection{Link prediction}
+\label{link-prediction}
+Link prediction is the task which aims at recovering missing links of graphs or predicting links that are going to be present in the future state of an evolving graph. A link prediction algorithm intends to make a ranking over all non-observed links from the most to the least probable by estimating scores associated to them. Link prediction can be used in two cases. It can be used directly, in the first case, to disclose the hidden relationships between entities presented as nodes in the graphs. In the second case, it is used to enrich links in the sparse graphs that are fit into graph-based learning systems.
+
+A considered number of link prediction methods which have been proposed in literature and have been applied to different domains ranging from recommendation systems, to bioinformatics, to social networks. Following \cite{link-prediction}, we can classify these methods in: \textit{similarity-based algorithms}, \textit{maximum likelihood methods}, and \textit{probabilistic models}. Following are descriptions of these categories.
+\begin{itemize}
+\item \textit{Similarity-based algorithms:} This is the most straightforward framework for link prediction. In these methods, each couple of nodes is assigned a score which is directly used as the proximity between between them. Since the nodes' attributes are normally hidden, most similarity-based methods work by considering structures of networks.
+
+\item \textit{Maximum likelihood methods:} In these algorithms, we assume some configurations of the network structure, rules and parameters obtained by maximizing the likelihood of the observed structure. We then compute the likelihood for non-observed links based on those rules and parameters. Hierachical structure \cite{hierachical-structure} and Stochastic block \cite{stochastic-block} are typical models for this group of link prediction methods.
+
+\item \textit{Probabilistic models:} For probabilistic models, we desire to abstract network structures. In order to predict the likelihood for non-observed links, we construct a probabilistic model that best fit observed data by optimizing a predefined target function. Probabilistic relational \cite{probabilistic-relational} is an example for probabilistic models.
+\end{itemize}
+
+Most popular link prediction methods fall into similarity-based group since they are simpler and computationally more efficient than maximum likelihood and probabilistic models. Among similarity-based methods, global ones normally outperform local algorithms because global methods are able to capture the glocal similarity between nodes of graph. Below we first introduce a set of diffusion-based graph node kernels which can be used as global prediction methods. We then shortly describe some local ones.
+
+A graph node kernel is a kernel which defines the similarity between nodes in a graph. Formally, a graph node kernel, $k(\cdot,\cdot)$, is defined as $k: V \times V \longrightarrow \mathbb{R}$ such that $k$ is symmetric positive semidefinite. Graph node kernels have been successfully applied in various domains ranging from recommendation systems to disease gene prioritization. Diffusion-based graph kernels are kernels that define similarity between any couple of nodes by condering paths connecting them.
+Given a graph, in order to use a graph node kernel for link prediction we first use kernel to compute a kernel matrix which encodes the similarity between any couple of nodes of the graph. The values inside the achieved matrix are used as the scores for non-observed links to be considered as link of the graph. Following are descriptions of some popular graph node kernels.
+
+\begin{itemize}
+\item \textit{Laplacian exponential diffusion kernel (LEDK)} \cite{ledk}: This kernel is based on heat diffusion phenomenon: imagine to initialize each vertex with a given amount of heat and let it flow through the edges until an arbitrary instant of time. The similarity between any vertex couple $v_{i}$, $v_{j}$ is the amount of heat starting from $v_{i}$ and reaching $v_{j}$ within a given time. The LEDK kernel matrix is computed by:
+\begin{equation}
+K_{LEDK} = e^{-\beta L}\; ,
+\end{equation}
+where $\beta$ is the diffusion parameter used to control the rate of
+diffusion, and $e^{X}=\sum_{k=0}^{\infty} \frac{1}{k!}X^k$ refers to the
+matrix exponential for matrix $X$. Choosing a consistent value for $\beta$ is
+very important: on the one side, if $\beta$ is too small, the local
+information cannot be diffused effectively and, on the other side, if it is
+too large, the local information will be lost. $K_{LEDK}$ is positive semi-
+definite as proved in \cite{ledk}.
+
+\item \textit{Markov exponential diffusion kernel (MEDK)} \cite{medk}: In LEDK, similarity values between high degree vertices is generally higher compared to that between low degree ones. This could be problematic since peripheral nodes have unbalanced similarities with respect to central nodes. To make the strength of individual vertices comparable, a modified version of LEDK is introduced:
+\begin{equation}
+K_{MEDK} = e^{-\beta M}\; ,
+\end{equation}
+where $M = (D-A-nI)/n$ and \textit{n}, \textit{I} are the total number of vertices in graph and identity matrix, respectively.
+
+\item \textit{Markov diffusion kernel (MDK)} \cite{mdk}: MDK exploits the idea of diffusion distance, which is a measure of how similar the pattern of heat diffusion is between a pair of initialized nodes. In other words, it expresses how much nodes ``influence'' each other in a similar fashion. From the transition matrix \textit{P} ($P = D^{-1} A$), we define $Z(t) = \frac{1}{t}\sum_{\tau=1}^{t} P^{\tau}$. MDK kernel matrix is then computed as follows:
+\begin{equation}
+K_{MDK} = Z(t) Z^{\top}(t)\; .
+\end{equation}
+
+\item \textit{Regularized Laplacian kernel (RLK)} \cite{rlk}: It represents a normalized version of the random walk with restart model. The kernel matrix is defined as:
+\begin{equation}
+K_{RLK} = \sum_{n=0}^{\infty}\beta^{n}(-L)^n\; ,
+\end{equation}
+where $\beta$ is again the diffusion parameter. RLK counts the paths connecting two nodes on the graph induced by taking \textit{-L} as the adjacency matrix, regardless of the path length. Thus, a non-zero value is assigned to any couple of nodes as long as they are connected by any indirect path.
+\end{itemize}
+
+Local link prediction methods only require local topological information of networks. These methods normally show lower performance comparing to glocal methods, but they require less time computation. In the case of graphs with small average shortest distance, they show good performance and are comparable with global ones. Following we describe some local methods of similarity-based group.
+
+\begin{itemize}
+\item Local path index (LPI) \cite{lpi1, lpi2}: Similar to Common neighbors method \cite{cn} which considers local paths with length 2, LPI takes into account paths with length 2 connecting two nodes to form their similarity. However, it also includes paths with length 3. Therefore, it is able to capture wider topological information.
+\begin{equation}
+s_{uv} = A^2 + \varepsilon A^3\; ,
+\end{equation}
+where $s_{uv}$ is the similarity between $u$ and $v$, $\varepsilon$ is a free parameter which allow to assign weight for paths with length 3.
+
+\item Local random walk index (LRWI) \cite{lrwi-srwi}: Consider a couple of nodes $u$ and $v$ in graph, to measure the similarity between them, we first let a random walker start from $u$ and we have initial density vector $\overrightarrow{\pi}_u(0) = \overrightarrow{e}_u$, $\overrightarrow{e}_u$ is a vector whose $u^{th}$ element equals to 1 and the rest equal to zero. This density vector at time $t+1$ is computed by $\overrightarrow{\pi}_u(t+1) = P^t \overrightarrow{\pi}_u(t)$. We then define LRWI at time $t$ as:
+\begin{equation}
+s_{uv}(t) = q_u \overrightarrow{\pi}_{uv}(t) + q_v \overrightarrow{\pi}_{vu}(t)\; ,
+\end{equation}
+where $q_u = \frac{k_u}{M}$ with $k_u$ is degree of $u$ and $M$ is the totall number of links in the graph.
+
+\item Superposed random walk index (SRWI) \cite{lrwi-srwi}: SRWI is an extension of LRWI in which a random walker is continuously released at the starting point. It can be computed as follow:
+\begin{equation}
+s_{uv}(t) = \sum_{\tau}^{t}{(q_u \overrightarrow{\pi}_{uv}(t) + q_v \overrightarrow{\pi}_{vu}(t))} \; .
+\end{equation}
+SRWI increases the similartities between nodes nearly located in the graph and it requires higher time complexity comparing to LRWI.
+\end{itemize}
+
+\section{Method}
+\label{method}
+Here we describe in detail our proposed method for link prediction and show how can we apply the method to predict links given a graph.
+\subsection{Node labeling}
+It is common that gene identifier is used to label for nodes of genetic graphs. However, in our method, we employ the node labeling procedure used in \cite{cdnk} for our labeling process since we desire to build a system which is based on the configuration of each gene's context. Particularly, we use as labels a discretized functional annotation based on the \textit{gene ontology} \cite{ontology}. More precisely,  we use the gene ontology to construct binary vectors representing the bag-of-words encoding for each gene (i.e. if a GO-term is associated with the gene). The resulting representations are then clustered so that genes with similar description profiles receive the same class identifier as label. Finally, node labels are used to define the graph isomorphism problem.
+\subsection{Link representation}
+In this section, we describe the procedure on we represent a link between $u$ and $v$ of the graph $G$. Given a radius $r$, we first extract neighborhood subgraphs $N_{r}^u$ and $N_{r}^v$ rooted at $u$ and $v$, respectively. We then take a union of these two obtained subgraphs to have a joint neighborhood subgraphs $G_{uv}^r$ where $G_{r}^{uv} = N_{r}^u \bigoplus N_{r}^v$. If the link $(u,v)$ is a non-observed link, we add $(u,v)$ into $G_{r}^{uv}$. Finally, we label for links in $G_{r}^{uv}$ by assigning a label "\textit{a}" for the link $(u,v)$ and a label "\textit{b}" for the rest of links.
+\subsection{The Neighborhood Subgraph Pairwise Distance Kernel}
+To measure the similarity between graphs, we adopt a kernel named NSPDK proposed in \cite{nspdk}. This kernel is an instance of convolution kernel \cite{covolution_kernel} where given a graph $G \in \mathcal{G}$ and two rooted graphs $A_u, B_v$, the relation $R_{r,d}(A_u, B_v, G)$ is true iff $A_u \cong \mathcal{N}_r^u$ is (up to isomorphism $\cong$) a neighborhood subgraph of radius $r$ of $G$ and so is $B_v \cong  \mathcal{N}_r^v$, with roots at distance $\mathcal{D}(u,v)= d$. We denote $R^{-1}$ as the inverse relation that returns all pairs of neighborhoods of radius $r$ at distance $d$ in $G$, $R^{-1}_{r,d}(G) = \lbrace A_u, B_v | R_{r,d}(A_u,B_v,G)=true\rbrace$. The kernel $\kappa_{r,d}$ over $\mathcal{G} \times \mathcal{G}$, counts the number of such fragments in common in two input graphs: 
+\begin{center}
+$\kappa_{r,d}(G,G^{'}) = 
+\!\!\!\!\!\!\!\!\!\!\!\! 
+\sum\limits_{\substack{A_u, B_v \ \in \ R_{r,d}^{-1}(G) \\ 
+{A'}_{u'}, {B'}_{v'} \ \in \ R_{r,d}^{-1}(G')
+}} \!\!\!\!\!\!\!\!\!\!\!\!  { { \textbf{1}_{A_{u} \cong A'_{u'}}} \cdot {
+\textbf{1}_{B_{v} \cong B'_{v'}}} }$, 
+\end{center} 
+\noindent where $\textbf{1}_{A \cong B}$ is the \textit{exact matching function} that returns 1 if $A$ is isomorphic to $B$ and 0 otherwise.  Finally, the NSPDK is defined as $K(G,G') = \sum\limits_{r}{\sum\limits_{d}{\kappa_{r,d}(G,G')}}$, where for efficiency reasons, the values of $r$ and $d$ are upper bounded to a given $r^*$ and $d^*$, respectively.
+
+\subsection{Joint neighborhood subgraph link prediction}
+In genetic graphs, it is difficult to state that there is no relation between a couple of nodes $u$ and $v$. Therefore, it is hard or even infeasible to form a negative link set which is normally used to train a binary classification model. This problem can be solved by using a oneclass classification model which only needs a positive link set for the learning process (training model).
+
+Given a graph $G = (V, E)$ and a radius $r$, we first extract a joint neighborhood subgraph $G_{uv}^r$ for each possible link $(u,v)$ of $G$. As a consequence, we achieve a positive subgraph set $G_E^r$ which represents for links in $E$ and  a non-observed subgraph set, $G_N^r$, representing for non-observed link set, respectively. The positive subgraph set $G_E^r$ is then used as the input to build a one-class classification model using NSPDK kernel. Once the model is trained, it returns a score $s_{uv}$ for each each non-observed link $(u,v)$. The score $s_{uv}$ shows how linkly of $(u,v)$ to be related to positive links.
+\section{Empirical evaluation}
+\label{evaluation}
+To empirically evaluate the ability of different link prediction methods described in \ref{link-prediction} to recover the missing links, we use sparse graphs induced from three datasets described below.
+\begin{itemize}
+\item \textbf{HPRD:} a database of curated proteomic information pertaining to human proteins. It is derived from \cite{hprd} with 9,465 vertices and 37,039 edges. We employ the HPRD version used in \cite{cdnk} that contains 7311 nodes and 30503 edges.
+\item \textbf{Phenotype similarity:} we use the OMIM \cite{omim} dataset and the phenotype similarity notion introduced by Van Driel et al. \cite{hprd} based on the relevance and the frequency of the Medical Subject Headings (MeSH) vocabulary terms in OMIM documents. We built the graph linking those genes whose associated phenotypes have a maximal phenotypic similarity greater than a fixed cut-off value. Following \cite{hprd}, we set the similarity cut-off to $0.3$. The resulting graph has 3393 nodes and 144739 edges.
+\item \textbf{Biogrigen} Genetic interaction is the phenomenon through which the effects of a gene are modified by one or several other genes. This occurs in indirect way by means of knock-on effects of multiple physical interactions. In practice, this is observed when the effects of two mutations in distinct genes is not equal to the sum of the effects of the mutations alone. This kind of interaction is complementary in respect to the physical one and is important especially for complex diseases involving a large number of genes. To construct the graph, we form a link between two genes if they interact.
+\end{itemize}
+
+\textbf{Evaluation method}
+
+Consider a graph $G = (V, E)$, in order to evaluate the performance of link predictions, we construct a positive set $P$ with all links in $E$ and an un-observed set, $U$, formed by randomly sample fromm un-observed links of the graph such that $\vert \mathcal{P} \vert = \frac{1}{2} \vert \mathcal{U} \vert$. We replicate this procedure 10 times. We assess the performance of link predictions via a 10-fold cross valdation on the positive set. Each round, only positive links in one fold are kept in the graphand links in the remaining 9 folds are removed from the graph, so they are converted to non-observed links. The obtained graph is used to compute the similarities for links in test set (9 folds). For JNSL, first a model is built from links in one fold by using a kernel machine SVMs with the use of NSPDK kernel. Then it is used to return scores for links in the 9 remaining folds. We collect all scores and compute the area under the curve for the receiver operating characteristics (AUC-ROC). The final performance is obtained by taking the average over (10-folds $\times$ 10) trials.
+
+\textbf{Model selections}
+
+The hyper-parameter of different methods are set by using a 3-fold cross-validation in which one fold is used for training and two other folds are used for validating.  We try the values for diffusion parameter of LEDK and MEDK in $\lbrace  0.01,\ 0.05,\ 0.1 \rbrace$, time steps in MDK in $\lbrace 3,\ 5,\ 10 \rbrace$ and RLK parameter in $\lbrace 0.01,\ 0.1,\ 1 \rbrace$, free parameter in LPI in $\lbrace 0.1,\ 0.3,\ 0.5 \rbrace$, time step in LRWI and SRWI in $\lbrace 5,\ 7 \rbrace$. For NSPDK, we try for maximum radius in $\lbrace 1,\ 2 \rbrace$, maximum distance in $\lbrace 2,\ 3,\ 4 \rbrace$. Finally, the fraction of training errors $nu$ for One-class SVM is chosen in $\lbrace 0.01,\ 0.1,\ 0.2,\ 0.3,\ 0.4,\ 0.5 \rbrace$ and regularization trade-off $C$ for binary SVM in $\lbrace 10^{-4},\ 10^{-3},\ 10^{-2},\ 10^{-1},\ 0,\ 10,\ 10^{2},\ 10^{3},\ 10^{4} \rbrace$.
+
+\section{Results and discussion}
+\label{result-discussion}
+\begin{table}[H]
+  \caption{The performance in AUC-ROC ($\%$) of different link prediction methods on graphs induced from three datasets: Biogridgen, Omim and HPRD.}
+  \label{table-result}
+  \centering
+  \begin{tabular}{c c c c}
+    \hline
+     & \multicolumn{3}{c}{Datasets} \\
+    \cmidrule{2-4}
+	 Methods & Biogridgen & Omim & HPRD \\
+	\hline
+	LEDK & 50.6$\pm$0.4 & 66.2$\pm$1.6 & 58.0$\pm$1.0 \\
+	MEDK & 50.0$\pm$0.0 & 50.1$\pm$0.0 & 50.0$\pm$0.0 \\
+	MDK & 50.7$\pm$0.6 & 68.1$\pm$1.8 & 64.9$\pm$0.4 \\
+	RLK & 50.7$\pm$0.6 & 68.1$\pm$1.8	& 63.5$\pm$0.5 \\
+	LPI & 50.2$\pm$0.3 & 60.6$\pm$1.1	& 52.8$\pm$0.2 \\
+	LRWI & 50.2$\pm$0.3 & 67.2$\pm$1.7	& 54.8$\pm$0.3 \\
+	SRWI & 50.2$\pm$0.3 & 66.2$\pm$1.6	& 56.7$\pm$1.0 \\
+	JNSL1 & 73.4$\pm$2.7 & 69.9$\pm$1.4	& 72.8$\pm$0.5 \\
+	JNSL2 & \textbf{79.9$\pm$1.9} & \textbf{72.5$\pm$1.3}	& \textbf{78.6$\pm$0.3} \\
+\hline
+  \end{tabular}
+\end{table}
+Table \ref{table-result} shows the synthesis results of our experiments. In the table, rows prepresent different link prediction methods, meanwhile columns illustrate different datasets (Biogridgen, Omim and HPRD) used to construct corresponding graphs. Here we report aggregated results which have averaged across a random choice of negative sets. Overall, our proposed method outperforms all compared link prediction methods on all data sets. In particular, it shows a remarkable difference (about 30$\%$) comparing other methods on Biogridgen data set. In addition, it performs about 14.7$\%$ and 4.4$\%$ higher than the second best one in HPRD and Omim, respectively. 
+
+\section{Conclusion and future work}
+\label{conclusion-futurework}
+In this paper, we have proposed an effective, novel link prediction method. Our method owns two strong points that help it to be a promissing link prediction method. The first point is the presentation of links. Each link is represented by a joint neighborhood subgraph which efficiently reflects its context in the graph. The second point is the adoption of a learning process before making predictions. Empirical experimental results shows that our proposed method is the state of the art in link prediction.
+
+%\subsubsection*{Acknowledgments}
+%This work was supported by the University of Padova, Strategic Project %BIOINFOGEN.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{}
+
+\bibitem{hprd} Van Driel, Marc A., et al.: A text-mining analysis of the human phenome." European journal of human genetics 14.5 (2006): 535-542.
+
+\bibitem{link-prediction} Lu, L., and Tao Z.: Link prediction in complex networks: A survey. Physica A: Statistical Mechanics and its Applications 390.6 (2011): 1150-1170.
+
+\bibitem{lhn} Leicht, E., et al: Vertex similarity in networks. Physical Review E 73.2 (2006): 026120.
+
+\bibitem{hierachical-structure} Redner, S.: Networks: teasing out the missing links. Nature 453.7191 (2008): 47-48.
+
+\bibitem{stochastic-block} White, H.C., et al.: Social structure from multiple networks. I. Blockmodels of roles and positions. American journal of sociology 81.4 (1976): 730-780.
+
+\bibitem{probabilistic-relational} Neville, J.: Statistical models and analysis techniques for learning in relational data. Diss. University of Massachusetts Amherst, 2006.
+
+\bibitem{lrw} Liu, W., and Linyuan L.: Link prediction based on local random walk. EPL (Europhysics Letters) 89.5 (2010): 58007.
+
+\bibitem{lpi1} Linyuan, L., et al: Similarity index based on local paths for link prediction of complex networks. Physical Review E 80.4 (2009): 046122.
+
+\bibitem{lpi2} Zhou, T., et al.: Predicting missing links via local information. The European Physical Journal B-Condensed Matter and Complex Systems 71.4 (2009): 623-630.
+
+\bibitem{lrwi-srwi} Linyuan, L., et al.: Similarity index based on local paths for link prediction of complex networks. Physical Review E 80.4 (2009): 046122.
+
+\bibitem{cn} Newman, M.E.: Clustering and preferential attachment in growing networks. Physical review E 64.2 (2001): 025102.
+
+\bibitem{ledk} Kondor, Risi Imre, and John Lafferty, Diffusion kernels on graphs and other discrete input spaces. ICML. Vol. 2. 2002.
+
+\bibitem{medk} Chen. B, et al. Disease gene identification by using graph kernels and Markov random fields. Science China Life Sciences 57.11 (2014): 1054-1063.
+
+\bibitem{mdk} Fouss F, et al. An experimental investigation of graph kernels on a collaborative recommendation task. Proceedings of the 6th international conference on data mining 2006. ICDM 2006, 863-868.
+
+\bibitem{rlk} Chebotarev P and Shamis E. The matrix forest therem and measuring relations in small social groups. Automation and Remote Control 1997, 58(9):1505-1514
+
+\bibitem{nspdk} C. Fabrizio, and K. De Grave, Fast neighborhood subgraph pairwise distance kernel. Proceedings of the 26th, International Conference on Machine Learning. Omnipress, 2010.
+
+\bibitem{covolution_kernel} Haussler, David. Convolution kernels on discrete structures. Vol. 646. Technical report, Department of Computer Science, University of California at Santa Cruz, 1999.
+
+\bibitem{ontology} Gene Ontology Consortium. The Gene Ontology (GO) database and informatics resource. Nucleic acids research,(2004) 32(suppl 1), D258-D261.
+
+\bibitem{cdnk} Tran-Van, D., Sperduti, A., and Costa, F.: Conjunctive disjunctive node kernel. Proceedings of 25th European Symposium on Artificial Neural Networks, Computational Intelligence and Machine Learning, 2017.
+
+\bibitem{omim} McKusick, Victor A.: Mendelian Inheritance in Man and its online version, OMIM. The American Journal of Human Genetics 80.4 (2007): 588-604.
+\end{thebibliography}
+\end{document}
